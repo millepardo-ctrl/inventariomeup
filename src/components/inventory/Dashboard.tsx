@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { PRODUCTS, CATEGORIES, CAT_KEY_MAP, AppUser, type Category } from "@/data/products";
+import { CATEGORIES, CAT_KEY_MAP, AppUser, type Category, type Product } from "@/data/products";
 import DashboardHeader from "@/components/inventory/DashboardHeader";
 import KpiBar from "@/components/inventory/KpiBar";
 import ProductCard from "@/components/inventory/ProductCard";
@@ -7,10 +7,11 @@ import { Search, X } from "lucide-react";
 
 interface DashboardProps {
   user: AppUser;
+  products: Product[];
   onLogout: () => void;
 }
 
-const Dashboard = ({ user, onLogout }: DashboardProps) => {
+const Dashboard = ({ user, products, onLogout }: DashboardProps) => {
   const [search, setSearch] = useState("");
   const [cat, setCat] = useState<"Todos" | Category>("Todos");
   const [filterStock, setFilterStock] = useState(false);
@@ -18,7 +19,7 @@ const Dashboard = ({ user, onLogout }: DashboardProps) => {
   const [filterRes, setFilterRes] = useState(false);
   const isVendedor = user.type === "vendedor";
 
-  const filtered = useMemo(() => PRODUCTS.filter(p => {
+  const filtered = useMemo(() => products.filter(p => {
     if (cat !== "Todos" && p.cat !== cat) return false;
     if (filterStock && (p.disp_baq + p.disp_cuc) <= 0) return false;
     if (filterNav && (p.d1 + p.d2) <= 0) return false;
@@ -28,7 +29,7 @@ const Dashboard = ({ user, onLogout }: DashboardProps) => {
       return p.n.toLowerCase().includes(q) || p.c.includes(q) || p.cat.toLowerCase().includes(q);
     }
     return true;
-  }), [search, cat, filterStock, filterNav, filterRes]);
+  }), [search, cat, filterStock, filterNav, filterRes, products]);
 
   const hasFilters = filterStock || filterNav || filterRes || cat !== "Todos" || search;
 
@@ -37,7 +38,7 @@ const Dashboard = ({ user, onLogout }: DashboardProps) => {
       <DashboardHeader user={user} onLogout={onLogout} />
 
       <div className="max-w-[1400px] mx-auto px-5 py-5">
-        <KpiBar isVendedor={isVendedor} />
+        <KpiBar products={products} isVendedor={isVendedor} />
 
         {/* Filters */}
         <div className="flex gap-2 mb-4 flex-wrap items-center">
