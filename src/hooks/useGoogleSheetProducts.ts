@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Product } from "@/data/products";
 
 const SHEET_CSV =
-  "https://corsproxy.io/?https://docs.google.com/spreadsheets/d/12SHVhcpfyOrCJjUaafNehAyhlo0hGdXv0458Xs9LSOI/export?format=csv&gid=846528846";
+  "https://docs.google.com/spreadsheets/d/12SHVhcpfyOrCJjUaafNehAyhlo0hGdXv0458Xs9LSOI/export?format=csv&gid=846528846";
 
 export function useGoogleSheetProducts() {
   const [products, setProducts] = useState<Product[]>([]);
