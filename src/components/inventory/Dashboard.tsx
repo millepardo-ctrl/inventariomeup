@@ -9,6 +9,9 @@ interface DashboardProps {
   user: AppUser;
   products: Product[];
   onLogout: () => void;
+  refreshing?: boolean;
+  lastUpdated?: Date | null;
+  onRefresh?: () => void;
 }
 
 const Dashboard = ({ user, products, onLogout }: DashboardProps) => {
