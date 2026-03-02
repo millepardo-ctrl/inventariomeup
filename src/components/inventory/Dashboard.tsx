@@ -14,7 +14,7 @@ interface DashboardProps {
   onRefresh?: () => void;
 }
 
-const Dashboard = ({ user, products, onLogout }: DashboardProps) => {
+const Dashboard = ({ user, products, onLogout, refreshing, lastUpdated, onRefresh }: DashboardProps) => {
   const [search, setSearch] = useState("");
   const [cat, setCat] = useState<"Todos" | Category>("Todos");
   const [filterStock, setFilterStock] = useState(false);
