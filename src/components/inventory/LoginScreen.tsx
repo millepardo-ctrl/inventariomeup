@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { AppUser, DIST_USERS } from "@/data/products";
-import MeUpLogo from "@/components/inventory/MeUpLogo";
+import meupLogo from "@/assets/logo-meup.png";
 
 interface LoginScreenProps {
   onLogin: (user: AppUser) => void;

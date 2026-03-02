@@ -1,6 +1,4 @@
-import { useState } from "react";
-import { AppUser } from "@/data/products";
-import MeUpLogo from "@/components/inventory/MeUpLogo";
+import meupLogo from "@/assets/logo-meup.png";
 
 interface RoleSelectionProps {
   onSelectVendedor: () => void;
