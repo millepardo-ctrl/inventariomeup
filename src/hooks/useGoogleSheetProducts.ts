@@ -5,6 +5,12 @@ import Papa from "papaparse";
 const SHEET_CSV =
   "https://docs.google.com/spreadsheets/d/12SHVhcpfyOrCJjUaafNehAyhlo0hGdXv0458Xs9LSOI/export?format=csv&gid=846528846";
 
+const NAV_CSV =
+  "https://docs.google.com/spreadsheets/d/12SHVhcpfyOrCJjUaafNehAyhlo0hGdXv0458Xs9LSOI/export?format=csv&gid=26483109";
+
+// Estados that map to Disp 1 (próximo a llegar)
+const DISP1_ESTADOS = new Set(["EN ADUANA", "EN PUERTO"]);
+
 const toNum = (val: any): number => {
   if (val === null || val === undefined || val === "") return 0;
   const cleaned = String(val)
@@ -25,15 +31,47 @@ export function useGoogleSheetProducts() {
   const fetchData = useCallback((isManual = false) => {
     if (isManual) setRefreshing(true);
 
-    fetch(SHEET_CSV)
-      .then((r) => r.text())
-      .then((csv) => {
-        const result = Papa.parse(csv, { skipEmptyLines: true });
+    Promise.all([
+      fetch(SHEET_CSV).then((r) => r.text()),
+      fetch(NAV_CSV).then((r) => r.text()),
+    ])
+      .then(([inventoryCsv, navCsv]) => {
+        // Parse navegación data to build ETA/estado map per product code
+        const navResult = Papa.parse(navCsv, { skipEmptyLines: true });
+        const navRows = (navResult.data as string[][]).slice(2); // skip header rows
+
+        // Group nav entries by code: { code -> { d1: {eta, estado}, d2: {eta, estado} } }
+        const navMap: Record<string, { eta1: string | null; est1: string | null; eta2: string | null; est2: string | null }> = {};
+
+        for (const cols of navRows) {
+          const code = String(cols[1] || "").trim();
+          if (!code.match(/^\d/)) continue;
+          const eta = String(cols[6] || "").trim() || null;
+          const estado = String(cols[8] || "").trim().toUpperCase() || null;
+          if (!estado) continue;
+
+          if (!navMap[code]) {
+            navMap[code] = { eta1: null, est1: null, eta2: null, est2: null };
+          }
+
+          const isDisp1 = DISP1_ESTADOS.has(estado);
+          if (isDisp1) {
+            navMap[code].eta1 = eta;
+            navMap[code].est1 = estado;
+          } else {
+            navMap[code].eta2 = eta;
+            navMap[code].est2 = estado;
+          }
+        }
+
+        // Parse inventory
+        const result = Papa.parse(inventoryCsv, { skipEmptyLines: true });
         const rows = (result.data as string[][]).slice(4);
         const parsed = rows
           .map((cols) => {
             const code = String(cols[0] || "").trim();
             if (!code.match(/^\d/)) return null;
+            const nav = navMap[code];
             return {
               c: code,
               n: String(cols[1] || "").trim(),
@@ -47,10 +85,10 @@ export function useGoogleSheetProducts() {
               disp_baq: toNum(cols[11]),
               d1: toNum(cols[13]),
               d2: toNum(cols[14]),
-              eta1: null,
-              eta2: null,
-              est1: null,
-              est2: null,
+              eta1: nav?.eta1 ?? null,
+              eta2: nav?.eta2 ?? null,
+              est1: nav?.est1 ?? null,
+              est2: nav?.est2 ?? null,
             } as Product;
           })
           .filter((p): p is Product => p !== null && !!p.n && !!p.cat);
