@@ -32,7 +32,7 @@ const LoginScreen = ({ onLogin }: LoginScreenProps) => {
     <div className="min-h-screen bg-landing flex flex-col items-center justify-center p-5">
       <div className="mb-8 text-center">
         <div className="bg-card rounded-2xl px-6 py-3 inline-block mb-3 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
-          <MeUpLogo className="h-12" />
+          <img src={meupLogo} alt="MeUp" className="h-12" />
         </div>
         <div className="text-xs text-muted-foreground uppercase tracking-[0.1em]">Portal de Distribuidores</div>
       </div>
