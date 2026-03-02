@@ -36,6 +36,9 @@
 
     --radius: 0.75rem;
 
+    /* Disp Barranquilla - Amber/Gold */
+    --disp-baq-value: 38 92% 40%;
+
     /* MeUp brand tokens */
     --header-bg: 222 47% 11%;
     --header-foreground: 0 0% 100%;
