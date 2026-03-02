@@ -60,6 +60,9 @@ const Index = () => {
     <Dashboard
       user={user!}
       products={products}
+      refreshing={refreshing}
+      lastUpdated={lastUpdated}
+      onRefresh={refresh}
       onLogout={() => {
         setUser(null);
         setShowLogin(false);
