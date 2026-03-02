@@ -9,7 +9,7 @@ import logoMeup from "@/assets/logo-meup.png";
 const Index = () => {
   const [user, setUser] = useState<AppUser | null>(null);
   const [showLogin, setShowLogin] = useState(false);
-  const { products, loading, error } = useGoogleSheetProducts();
+  const { products, loading, refreshing, error, lastUpdated, refresh } = useGoogleSheetProducts();
 
   if (!user && !showLogin) {
     return (
@@ -60,6 +60,9 @@ const Index = () => {
     <Dashboard
       user={user!}
       products={products}
+      refreshing={refreshing}
+      lastUpdated={lastUpdated}
+      onRefresh={refresh}
       onLogout={() => {
         setUser(null);
         setShowLogin(false);

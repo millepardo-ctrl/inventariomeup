@@ -9,9 +9,12 @@ interface DashboardProps {
   user: AppUser;
   products: Product[];
   onLogout: () => void;
+  refreshing?: boolean;
+  lastUpdated?: Date | null;
+  onRefresh?: () => void;
 }
 
-const Dashboard = ({ user, products, onLogout }: DashboardProps) => {
+const Dashboard = ({ user, products, onLogout, refreshing, lastUpdated, onRefresh }: DashboardProps) => {
   const [search, setSearch] = useState("");
   const [cat, setCat] = useState<"Todos" | Category>("Todos");
   const [filterStock, setFilterStock] = useState(false);
@@ -35,7 +38,7 @@ const Dashboard = ({ user, products, onLogout }: DashboardProps) => {
 
   return (
     <div className="min-h-screen bg-background">
-      <DashboardHeader user={user} onLogout={onLogout} />
+      <DashboardHeader user={user} onLogout={onLogout} refreshing={refreshing} lastUpdated={lastUpdated} onRefresh={onRefresh} />
 
       <div className="max-w-[1400px] mx-auto px-5 py-5">
         <KpiBar products={products} isVendedor={isVendedor} />
