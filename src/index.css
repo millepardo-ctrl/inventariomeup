@@ -36,26 +36,41 @@
 
     --radius: 0.75rem;
 
-    /* Stone Castle custom tokens */
+    /* MeUp brand tokens */
     --header-bg: 222 47% 11%;
     --header-foreground: 0 0% 100%;
     --header-muted: 215 25% 27%;
 
-    --kpi-value: 222 47% 11%;
-    --kpi-label: 215 16% 47%;
-    --kpi-sub: 215 25% 65%;
+    --landing-bg: 228 58% 9%;
+    --landing-card: 222 41% 12%;
+    --landing-border: 215 25% 18%;
 
-    --cat-marmol: 217 91% 60%;
+    /* Category tokens */
+    --cat-marmol: 224 76% 48%;
     --cat-marmol-bg: 214 95% 93%;
+    --cat-marmol-label: 224 73% 33%;
+
     --cat-travertino: 160 84% 39%;
     --cat-travertino-bg: 152 81% 96%;
-    --cat-bali: 45 93% 47%;
+    --cat-travertino-label: 163 72% 25%;
+
+    --cat-bali: 32 95% 44%;
     --cat-bali-bg: 48 96% 89%;
+    --cat-bali-label: 28 80% 26%;
+
     --cat-splitface: 271 81% 56%;
     --cat-splitface-bg: 270 100% 98%;
+    --cat-splitface-label: 273 72% 32%;
+
     --cat-pizarra: 215 19% 35%;
     --cat-pizarra-bg: 210 20% 96%;
+    --cat-pizarra-label: 222 47% 11%;
 
+    --cat-complementarios: 21 90% 48%;
+    --cat-complementarios-bg: 33 100% 96%;
+    --cat-complementarios-label: 17 79% 28%;
+
+    /* Transit & reserved */
     --transit-bg: 214 95% 93%;
     --transit-border: 213 97% 87%;
     --transit-value: 224 76% 48%;
@@ -116,12 +131,6 @@
   }
 }
 
-@layer utilities {
-  .font-mono-data {
-    font-family: 'DM Mono', monospace;
-  }
-}
-
 @keyframes fadeSlideIn {
   from { opacity: 0; transform: translateY(-6px); }
   to { opacity: 1; transform: translateY(0); }
@@ -131,7 +140,6 @@
   animation: fadeSlideIn 0.2s ease-out;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: hsl(var(--accent)); }
 ::-webkit-scrollbar-thumb { background: hsl(var(--muted)); border-radius: 3px; }
