@@ -5,6 +5,12 @@ import Papa from "papaparse";
 const SHEET_CSV =
   "https://docs.google.com/spreadsheets/d/12SHVhcpfyOrCJjUaafNehAyhlo0hGdXv0458Xs9LSOI/export?format=csv&gid=846528846";
 
+const NAV_CSV =
+  "https://docs.google.com/spreadsheets/d/12SHVhcpfyOrCJjUaafNehAyhlo0hGdXv0458Xs9LSOI/export?format=csv&gid=26483109";
+
+// Estados that map to Disp 1 (próximo a llegar)
+const DISP1_ESTADOS = new Set(["EN ADUANA", "EN PUERTO"]);
+
 const toNum = (val: any): number => {
   if (val === null || val === undefined || val === "") return 0;
   const cleaned = String(val)
