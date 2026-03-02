@@ -1,18 +1,19 @@
-import { PRODUCTS } from "@/data/products";
+import { Product } from "@/data/products";
 
 interface KpiBarProps {
+  products: Product[];
   isVendedor: boolean;
 }
 
-const KpiBar = ({ isVendedor }: KpiBarProps) => {
-  const totBaq = PRODUCTS.reduce((s, p) => s + p.disp_baq, 0);
-  const totCuc = PRODUCTS.reduce((s, p) => s + p.disp_cuc, 0);
-  const totD1 = PRODUCTS.reduce((s, p) => s + p.d1, 0);
-  const totD2 = PRODUCTS.reduce((s, p) => s + p.d2, 0);
-  const totRes = PRODUCTS.reduce((s, p) => s + p.res, 0);
-  const totPre = PRODUCTS.reduce((s, p) => s + p.pre_res, 0);
-  const withD1 = PRODUCTS.filter(p => p.d1 > 0).length;
-  const withD2 = PRODUCTS.filter(p => p.d2 > 0).length;
+const KpiBar = ({ products, isVendedor }: KpiBarProps) => {
+  const totBaq = products.reduce((s, p) => s + p.disp_baq, 0);
+  const totCuc = products.reduce((s, p) => s + p.disp_cuc, 0);
+  const totD1 = products.reduce((s, p) => s + p.d1, 0);
+  const totD2 = products.reduce((s, p) => s + p.d2, 0);
+  const totRes = products.reduce((s, p) => s + p.res, 0);
+  const totPre = products.reduce((s, p) => s + p.pre_res, 0);
+  const withD1 = products.filter(p => p.d1 > 0).length;
+  const withD2 = products.filter(p => p.d2 > 0).length;
 
   const kpis = [
     { label: "Disp. Barranquilla", value: totBaq.toLocaleString("es-CO", { maximumFractionDigits: 0 }), sub: "m² / Und disponibles", icon: "🔵", color: "text-foreground" },
