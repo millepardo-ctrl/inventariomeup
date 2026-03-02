@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Product } from "@/data/products";
+import Papa from "papaparse";
 
 const SHEET_CSV =
   "https://docs.google.com/spreadsheets/d/12SHVhcpfyOrCJjUaafNehAyhlo0hGdXv0458Xs9LSOI/export?format=csv&gid=846528846";
@@ -17,17 +18,17 @@ export function useGoogleSheetProducts() {
     fetch(SHEET_CSV)
       .then((r) => r.text())
       .then((csv) => {
-        const rows = csv.split("\n").slice(4);
+        const result = Papa.parse(csv, { skipEmptyLines: true });
+        const rows = (result.data as string[][]).slice(4);
         const parsed = rows
-          .map((row) => {
-            const cols = row.split(",");
-            const code = cols[0]?.replace(/"/g, "").trim();
-            if (!code || !code.match(/^\d/)) return null;
+          .map((cols) => {
+            const code = String(cols[0] || "").trim();
+            if (!code.match(/^\d/)) return null;
             return {
               c: code,
-              n: cols[1]?.replace(/"/g, "").trim() ?? "",
-              u: cols[2]?.replace(/"/g, "").trim() ?? "",
-              cat: cols[3]?.replace(/"/g, "").trim() ?? "",
+              n: String(cols[1] || "").trim(),
+              u: String(cols[2] || "").trim(),
+              cat: String(cols[3] || "").trim(),
               stock_cuc: parseFloat(cols[6]) || 0,
               stock_baq: parseFloat(cols[7]) || 0,
               res: parseFloat(cols[8]) || 0,
@@ -42,7 +43,7 @@ export function useGoogleSheetProducts() {
               est2: null,
             } as Product;
           })
-          .filter((p): p is Product => p !== null && !!p.n);
+          .filter((p): p is Product => p !== null && !!p.n && !!p.cat);
         setProducts(parsed);
         setLastUpdated(new Date());
         setLoading(false);
