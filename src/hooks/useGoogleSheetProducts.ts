@@ -5,6 +5,16 @@ import Papa from "papaparse";
 const SHEET_CSV =
   "https://docs.google.com/spreadsheets/d/12SHVhcpfyOrCJjUaafNehAyhlo0hGdXv0458Xs9LSOI/export?format=csv&gid=846528846";
 
+const toNum = (val: any): number => {
+  if (val === null || val === undefined || val === "") return 0;
+  const cleaned = String(val)
+    .replace(/['"]/g, "")
+    .replace(/\.(?=\d{3})/g, "")
+    .replace(/,(?=\d{3})/g, "")
+    .replace(",", ".");
+  return parseFloat(cleaned) || 0;
+};
+
 export function useGoogleSheetProducts() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
