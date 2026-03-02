@@ -58,6 +58,14 @@
     --cat-bali-bg: 48 96% 89%;
     --cat-bali-label: 28 80% 26%;
 
+    --cat-granito: 263 70% 50%;
+    --cat-granito-bg: 263 100% 97%;
+    --cat-granito-label: 263 72% 30%;
+
+    --cat-piedra: 20 85% 42%;
+    --cat-piedra-bg: 33 100% 96%;
+    --cat-piedra-label: 17 79% 28%;
+
     --cat-splitface: 271 81% 56%;
     --cat-splitface-bg: 270 100% 98%;
     --cat-splitface-label: 273 72% 32%;
@@ -66,20 +74,37 @@
     --cat-pizarra-bg: 210 20% 96%;
     --cat-pizarra-label: 222 47% 11%;
 
+    --cat-accesorios: 143 64% 34%;
+    --cat-accesorios-bg: 138 76% 97%;
+    --cat-accesorios-label: 143 64% 18%;
+
     --cat-complementarios: 21 90% 48%;
     --cat-complementarios-bg: 33 100% 96%;
     --cat-complementarios-label: 17 79% 28%;
 
-    /* Transit & reserved */
+    /* Disp 1 - Teal/Cyan instead of orange */
+    --disp1-bg: 172 66% 93%;
+    --disp1-border: 172 56% 82%;
+    --disp1-value: 172 63% 28%;
+    --disp1-label: 172 55% 38%;
+
+    /* Disp 2 / Transit */
     --transit-bg: 214 95% 93%;
     --transit-border: 213 97% 87%;
     --transit-value: 224 76% 48%;
     --transit-label: 217 91% 60%;
 
-    --reserved-bg: 33 100% 96%;
-    --reserved-border: 24 94% 78%;
-    --reserved-value: 21 90% 48%;
-    --reserved-label: 21 90% 48%;
+    /* Reserved */
+    --reserved-bg: 347 100% 97%;
+    --reserved-border: 347 94% 86%;
+    --reserved-value: 347 77% 42%;
+    --reserved-label: 347 83% 47%;
+
+    /* Pre-reserved */
+    --prereserved-bg: 270 100% 98%;
+    --prereserved-border: 270 90% 88%;
+    --prereserved-value: 273 72% 47%;
+    --prereserved-label: 271 81% 56%;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;

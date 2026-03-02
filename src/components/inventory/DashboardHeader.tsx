@@ -1,5 +1,5 @@
 import { AppUser } from "@/data/products";
-import MeUpLogo from "@/components/inventory/MeUpLogo";
+import meupLogo from "@/assets/logo-meup.png";
 
 interface DashboardHeaderProps {
   user: AppUser;
@@ -11,23 +11,14 @@ const DashboardHeader = ({ user, onLogout }: DashboardHeaderProps) => {
 
   return (
     <header className="bg-header sticky top-0 z-50 shadow-[0_1px_0_rgba(255,255,255,0.06)]">
-      <div className="max-w-[1300px] mx-auto flex items-center gap-4 px-5 h-[58px]">
+      <div className="max-w-[1400px] mx-auto flex items-center gap-4 px-5 h-[58px]">
         <div className="bg-card rounded-lg px-2.5 py-1 flex items-center">
-          <MeUpLogo className="h-7" />
+          <img src={meupLogo} alt="MeUp" className="h-7" />
         </div>
         <div className="h-7 w-px bg-secondary" />
-        <span className="text-xs text-muted-foreground uppercase tracking-wider">Inventario en Tiempo Real</span>
+        <span className="text-xs text-muted-foreground uppercase tracking-wider hidden sm:inline">Inventario en Tiempo Real</span>
 
         <div className="flex-1" />
-
-        {/* Role badge */}
-        <div className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider border ${
-          isVendedor
-            ? "bg-[hsl(213,50%,25%)] text-primary border-primary/25"
-            : "bg-[hsl(24,10%,11%)] text-[hsl(30,5%,64%)] border-[hsl(20,6%,26%)]"
-        }`}>
-          {isVendedor ? "👤 Vendedor" : `🏪 ${user.name}`}
-        </div>
 
         {/* Google Sheet link for vendedor */}
         {isVendedor && (
@@ -41,6 +32,15 @@ const DashboardHeader = ({ user, onLogout }: DashboardHeaderProps) => {
           </a>
         )}
 
+        {/* Role badge */}
+        <div className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider border ${
+          isVendedor
+            ? "bg-[hsl(213,50%,25%)] text-primary border-primary/25"
+            : "bg-[hsl(24,10%,11%)] text-[hsl(30,5%,64%)] border-[hsl(20,6%,26%)]"
+        }`}>
+          {isVendedor ? "👤 Vendedor" : `🏪 ${user.name}`}
+        </div>
+
         {/* Logout for distributors */}
         {!isVendedor && (
           <button
@@ -51,7 +51,7 @@ const DashboardHeader = ({ user, onLogout }: DashboardHeaderProps) => {
           </button>
         )}
 
-        <span className="text-[11px] text-muted-foreground hidden sm:inline">26 Feb 2026</span>
+        <span className="text-[11px] text-muted-foreground hidden sm:inline">2 Mar 2026</span>
       </div>
     </header>
   );

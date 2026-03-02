@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { Product, CAT_KEY_MAP, fmt } from "@/data/products";
+import EstadoBadge from "@/components/inventory/EstadoBadge";
 
 interface ProductCardProps {
   product: Product;
@@ -10,9 +11,9 @@ interface ProductCardProps {
 const ProductCard = ({ product: p, isVendedor }: ProductCardProps) => {
   const [expanded, setExpanded] = useState(false);
   const catKey = CAT_KEY_MAP[p.cat];
-  const totalBodega = p.baq + p.cuc;
   const hasNav = p.d1 > 0 || p.d2 > 0;
-  const hasReservas = p.res > 0;
+  const hasReservas = isVendedor && p.res > 0;
+  const hasPreRes = isVendedor && p.pre_res > 0;
 
   return (
     <div
@@ -22,10 +23,10 @@ const ProductCard = ({ product: p, isVendedor }: ProductCardProps) => {
       }`}
       style={{ borderLeftWidth: 4, borderLeftColor: `hsl(var(--cat-${catKey}))` }}
     >
-      {/* Row */}
+      {/* Collapsed Row */}
       <div className="flex items-center gap-2.5 px-3.5 py-3 flex-wrap">
         <div className="flex-1 min-w-[180px]">
-          <div className="flex items-center gap-1.5 mb-0.5">
+          <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
             <span
               className="text-[10px] font-bold px-1.5 py-px rounded-full uppercase tracking-wider whitespace-nowrap"
               style={{
@@ -40,46 +41,66 @@ const ProductCard = ({ product: p, isVendedor }: ProductCardProps) => {
           <div className="text-[13px] font-semibold text-foreground leading-tight">{p.n}</div>
         </div>
 
-        {/* Barranquilla - highlighted */}
+        {/* Disp B/quilla */}
         <div
           className="rounded-lg px-2.5 py-1.5 text-center min-w-[70px]"
           style={{
-            backgroundColor: p.baq > 0 ? `hsl(var(--cat-${catKey}-bg))` : undefined,
+            backgroundColor: p.disp_baq > 0 ? `hsl(var(--cat-${catKey}-bg))` : undefined,
             borderWidth: 1,
-            borderColor: p.baq > 0 ? `hsl(var(--cat-${catKey}) / 0.25)` : `hsl(var(--border))`,
+            borderColor: p.disp_baq > 0 ? `hsl(var(--cat-${catKey}) / 0.25)` : `hsl(var(--border))`,
           }}
         >
+          <div className="text-[15px] font-extrabold font-mono text-foreground">
+            {fmt(p.disp_baq)}
+          </div>
+          <div className="text-[10px] text-muted-foreground">🔵 B/quilla</div>
+        </div>
+
+        {/* Disp Cúcuta */}
+        <div className="text-center min-w-[58px]">
           <div className="text-sm font-bold font-mono text-foreground">
-            {p.baq > 0 ? p.baq.toLocaleString("es-CO", { maximumFractionDigits: 1 }) : "—"}
+            {fmt(p.disp_cuc)}
           </div>
-          <div className="text-[10px] text-muted-foreground">B/quilla</div>
+          <div className="text-[10px] text-muted-foreground">⚪ Cúcuta</div>
         </div>
 
-        {/* Cúcuta */}
-        <div className="text-center min-w-[55px]">
-          <div className="text-[13px] font-bold font-mono text-foreground">
-            {p.cuc > 0 ? p.cuc.toLocaleString("es-CO", { maximumFractionDigits: 1 }) : "—"}
-          </div>
-          <div className="text-[10px] text-muted-foreground">Cúcuta</div>
-        </div>
-
-        {/* Transit */}
-        {hasNav && (
-          <div className="bg-transit-bg border border-transit-border rounded-lg px-2.5 py-1 text-center">
-            <div className="text-xs font-bold text-transit-value font-mono">
-              {(p.d1 + p.d2).toLocaleString("es-CO", { maximumFractionDigits: 1 })}
+        {/* Disp 1 pill - Teal */}
+        {p.d1 > 0 && (
+          <div className="bg-[hsl(var(--disp1-bg))] border border-[hsl(var(--disp1-border))] rounded-lg px-2.5 py-1 text-center min-w-[68px]">
+            <div className="text-[13px] font-bold text-[hsl(var(--disp1-value))] font-mono">
+              {fmt(p.d1)}
             </div>
-            <div className="text-[10px] text-transit-label">En tránsito</div>
+            <div className="text-[9px] text-[hsl(var(--disp1-label))]">
+              🟢 Disp.1{p.eta1 ? ` · ${p.eta1}` : ""}
+            </div>
           </div>
         )}
 
-        {/* Reserved */}
-        {isVendedor && hasReservas && (
-          <div className="bg-reserved-bg border border-reserved-border rounded-lg px-2.5 py-1 text-center">
-            <div className="text-xs font-bold text-reserved-value font-mono">
-              {p.res.toLocaleString("es-CO", { maximumFractionDigits: 1 })}
+        {/* Disp 2 pill */}
+        {p.d2 > 0 && (
+          <div className="bg-transit-bg border border-transit-border rounded-lg px-2.5 py-1 text-center min-w-[68px]">
+            <div className="text-[13px] font-bold text-transit-value font-mono">
+              {fmt(p.d2)}
             </div>
-            <div className="text-[10px] text-reserved-label">Reservado</div>
+            <div className="text-[9px] text-transit-label">
+              🔵 Disp.2{p.eta2 ? ` · ${p.eta2}` : ""}
+            </div>
+          </div>
+        )}
+
+        {/* Reservas */}
+        {hasReservas && (
+          <div className="bg-reserved-bg border border-reserved-border rounded-lg px-2.5 py-1 text-center min-w-[62px]">
+            <div className="text-[13px] font-bold text-reserved-value font-mono">{fmt(p.res)}</div>
+            <div className="text-[9px] text-reserved-label">🔒 Reservas</div>
+          </div>
+        )}
+
+        {/* Pre-reserva */}
+        {hasPreRes && (
+          <div className="bg-[hsl(var(--prereserved-bg))] border border-[hsl(var(--prereserved-border))] rounded-lg px-2.5 py-1 text-center min-w-[62px]">
+            <div className="text-[13px] font-bold text-[hsl(var(--prereserved-value))] font-mono">{fmt(p.pre_res)}</div>
+            <div className="text-[9px] text-[hsl(var(--prereserved-label))]">🔮 Pre-res.</div>
           </div>
         )}
 
@@ -89,66 +110,79 @@ const ProductCard = ({ product: p, isVendedor }: ProductCardProps) => {
       {/* Expanded detail */}
       {expanded && (
         <div className="px-3.5 pb-3.5 pt-0">
-          <div className="pt-3 border-t border-border grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 animate-fade-slide-in">
-            {/* Stock */}
-            <div className="rounded-[9px] p-3 shadow-sm bg-card border border-border">
-              <div className="text-[10px] font-bold text-foreground mb-1.5 uppercase tracking-widest">📦 Stock en Bodega</div>
-              <div className="flex justify-between">
-                <div>
-                  <div className="text-xl font-black text-foreground font-mono">{fmt(p.baq)}</div>
-                  <div className="text-[11px] text-muted-foreground">B/quilla · {p.u}</div>
-                </div>
-                <div className="text-right">
-                  <div className="text-xl font-black text-foreground font-mono">{fmt(p.cuc)}</div>
-                  <div className="text-[11px] text-muted-foreground">Cúcuta · {p.u}</div>
-                </div>
+          <div
+            className="p-3.5 rounded-[10px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 animate-fade-slide-in"
+            style={{ backgroundColor: `hsl(var(--cat-${catKey}-bg))` }}
+          >
+            {/* Disp B/quilla */}
+            <div className="bg-card rounded-[9px] p-3 shadow-sm">
+              <div className="text-[10px] font-bold uppercase tracking-widest mb-1.5" style={{ color: `hsl(var(--cat-${catKey}-label))` }}>
+                🔵 Disponible B/quilla
               </div>
-              {totalBodega > 0 && (
-                <div className="mt-2 pt-2 border-t border-border/50">
-                  <span className="text-[11px] font-semibold" style={{ color: `hsl(var(--cat-${catKey}))` }}>
-                    Total: {totalBodega.toLocaleString("es-CO", { maximumFractionDigits: 1 })} {p.u}
-                  </span>
-                </div>
+              <div className="text-2xl font-black font-mono" style={{ color: p.disp_baq > 0 ? `hsl(var(--cat-${catKey}))` : `hsl(var(--muted-foreground))` }}>
+                {fmt(p.disp_baq)}
+              </div>
+              <div className="text-[11px] text-muted-foreground mt-0.5">{p.u} disponibles</div>
+              {p.stock_baq !== p.disp_baq && (
+                <div className="text-[10px] text-muted-foreground mt-1">Stock físico: {fmt(p.stock_baq)} {p.u}</div>
               )}
             </div>
 
-            {/* Navigation */}
-            {hasNav ? (
-              <div className="bg-transit-bg rounded-[9px] p-3 shadow-sm">
-                <div className="text-[10px] font-bold text-transit-value mb-1.5 uppercase tracking-widest">🚢 Próximas Llegadas</div>
-                {p.d1 > 0 && (
-                  <div className="mb-2">
-                    <span className="text-[11px] text-transit-label font-semibold">Disp. 1 — más próximo</span>
-                    <div className="text-xl font-black text-transit-value font-mono">
-                      {fmt(p.d1)} <span className="text-[11px] font-normal">{p.u}</span>
-                    </div>
-                    {p.eta1 && <div className="text-[10px] text-transit-label mt-0.5">📅 ETA: {p.eta1}</div>}
-                  </div>
-                )}
-                {p.d2 > 0 && (
-                  <div className={p.d1 > 0 ? "border-t border-transit-border pt-2" : ""}>
-                    <span className="text-[11px] text-transit-label font-semibold">Disp. 2 — siguiente</span>
-                    <div className="text-xl font-black text-transit-value font-mono">
-                      {fmt(p.d2)} <span className="text-[11px] font-normal">{p.u}</span>
-                    </div>
-                    {p.eta2 && <div className="text-[10px] text-transit-label mt-0.5">📅 ETA: {p.eta2}</div>}
-                  </div>
-                )}
+            {/* Disp Cúcuta */}
+            <div className="bg-card rounded-[9px] p-3 shadow-sm">
+              <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">⚪ Disponible Cúcuta</div>
+              <div className={`text-2xl font-black font-mono ${p.disp_cuc > 0 ? "text-muted-foreground" : "text-muted"}`}>
+                {fmt(p.disp_cuc)}
               </div>
-            ) : (
-              <div className="bg-card border border-border rounded-[9px] p-3 flex items-center justify-center">
+              <div className="text-[11px] text-muted-foreground mt-0.5">{p.u} disponibles</div>
+              {p.stock_cuc !== p.disp_cuc && (
+                <div className="text-[10px] text-muted-foreground mt-1">Stock físico: {fmt(p.stock_cuc)} {p.u}</div>
+              )}
+            </div>
+
+            {/* Disp 1 - Teal */}
+            {p.d1 > 0 && (
+              <div className="bg-card rounded-[9px] p-3 shadow-sm">
+                <div className="text-[10px] font-bold text-[hsl(var(--disp1-value))] uppercase tracking-widest mb-1.5">🟢 Disp. 1 — Próximo</div>
+                <div className="text-2xl font-black text-[hsl(var(--disp1-value))] font-mono">{fmt(p.d1)}</div>
+                <div className="text-[11px] text-muted-foreground mt-0.5">{p.u}</div>
+                {p.eta1 && <div className="text-[10px] text-[hsl(var(--disp1-label))] mt-1">📅 ETA: {p.eta1}</div>}
+                {p.est1 && <div className="mt-1.5"><EstadoBadge estado={p.est1} /></div>}
+              </div>
+            )}
+
+            {/* Disp 2 */}
+            {p.d2 > 0 && (
+              <div className="bg-card rounded-[9px] p-3 shadow-sm">
+                <div className="text-[10px] font-bold text-transit-value uppercase tracking-widest mb-1.5">🔵 Disp. 2 — En Tránsito</div>
+                <div className="text-2xl font-black text-transit-value font-mono">{fmt(p.d2)}</div>
+                <div className="text-[11px] text-muted-foreground mt-0.5">{p.u}</div>
+                {p.eta2 && <div className="text-[10px] text-transit-label mt-1">📅 ETA: {p.eta2}</div>}
+                {p.est2 && <div className="mt-1.5"><EstadoBadge estado={p.est2} /></div>}
+              </div>
+            )}
+
+            {!hasNav && (
+              <div className="bg-card rounded-[9px] p-3 flex items-center justify-center opacity-60">
                 <span className="text-xs text-muted-foreground">Sin material en tránsito</span>
               </div>
             )}
 
             {/* Reservas */}
-            {isVendedor && hasReservas && (
-              <div className="bg-reserved-bg rounded-[9px] p-3 shadow-sm">
-                <div className="text-[10px] font-bold text-reserved-value mb-1.5 uppercase tracking-widest">🔒 Reservas Activas</div>
-                <div className="text-xl font-black text-reserved-value font-mono">
-                  {fmt(p.res)} <span className="text-[11px] font-normal text-reserved-label">{p.u}</span>
-                </div>
-                <div className="text-[11px] text-reserved-label mt-1">Material bloqueado</div>
+            {hasReservas && (
+              <div className="bg-card rounded-[9px] p-3 shadow-sm">
+                <div className="text-[10px] font-bold text-reserved-value uppercase tracking-widest mb-1.5">🔒 Reservas Activas</div>
+                <div className="text-2xl font-black text-reserved-value font-mono">{fmt(p.res)}</div>
+                <div className="text-[11px] text-reserved-label mt-0.5">Material bloqueado para clientes</div>
+              </div>
+            )}
+
+            {/* Pre-reserva */}
+            {hasPreRes && (
+              <div className="bg-card rounded-[9px] p-3 shadow-sm">
+                <div className="text-[10px] font-bold text-[hsl(var(--prereserved-value))] uppercase tracking-widest mb-1.5">🔮 Pre-Reserva en Tránsito</div>
+                <div className="text-2xl font-black text-[hsl(var(--prereserved-value))] font-mono">{fmt(p.pre_res)}</div>
+                <div className="text-[11px] text-[hsl(var(--prereserved-label))] mt-0.5">Comprometido sobre contenedor</div>
               </div>
             )}
           </div>
