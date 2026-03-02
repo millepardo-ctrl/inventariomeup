@@ -116,10 +116,10 @@ const ProductCard = ({ product: p, isVendedor }: ProductCardProps) => {
           >
             {/* Disp B/quilla */}
             <div className="bg-card rounded-[9px] p-3 shadow-sm">
-              <div className="text-[10px] font-bold uppercase tracking-widest mb-1.5" style={{ color: `hsl(var(--cat-${catKey}-label))` }}>
-                🔵 Disponible B/quilla
+              <div className="text-[10px] font-bold text-[hsl(var(--disp-baq-value))] uppercase tracking-widest mb-1.5">
+                🟡 Disponible B/quilla
               </div>
-              <div className="text-2xl font-black font-mono" style={{ color: p.disp_baq > 0 ? `hsl(var(--cat-${catKey}))` : `hsl(var(--muted-foreground))` }}>
+              <div className="text-2xl font-black font-mono" style={{ color: p.disp_baq > 0 ? `hsl(var(--disp-baq-value))` : `hsl(var(--muted-foreground))` }}>
                 {fmt(p.disp_baq)}
               </div>
               <div className="text-[11px] text-muted-foreground mt-0.5">{p.u} disponibles</div>
