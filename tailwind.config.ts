@@ -8,9 +8,7 @@ export default {
     container: {
       center: true,
       padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-      },
+      screens: { "2xl": "1400px" },
     },
     extend: {
       fontFamily: {
@@ -66,17 +64,30 @@ export default {
           foreground: "hsl(var(--header-foreground))",
           muted: "hsl(var(--header-muted))",
         },
+        landing: {
+          DEFAULT: "hsl(var(--landing-bg))",
+          card: "hsl(var(--landing-card))",
+          border: "hsl(var(--landing-border))",
+        },
         cat: {
           marmol: "hsl(var(--cat-marmol))",
           "marmol-bg": "hsl(var(--cat-marmol-bg))",
+          "marmol-label": "hsl(var(--cat-marmol-label))",
           travertino: "hsl(var(--cat-travertino))",
           "travertino-bg": "hsl(var(--cat-travertino-bg))",
+          "travertino-label": "hsl(var(--cat-travertino-label))",
           bali: "hsl(var(--cat-bali))",
           "bali-bg": "hsl(var(--cat-bali-bg))",
+          "bali-label": "hsl(var(--cat-bali-label))",
           splitface: "hsl(var(--cat-splitface))",
           "splitface-bg": "hsl(var(--cat-splitface-bg))",
+          "splitface-label": "hsl(var(--cat-splitface-label))",
           pizarra: "hsl(var(--cat-pizarra))",
           "pizarra-bg": "hsl(var(--cat-pizarra-bg))",
+          "pizarra-label": "hsl(var(--cat-pizarra-label))",
+          complementarios: "hsl(var(--cat-complementarios))",
+          "complementarios-bg": "hsl(var(--cat-complementarios-bg))",
+          "complementarios-label": "hsl(var(--cat-complementarios-label))",
         },
         transit: {
           bg: "hsl(var(--transit-bg))",
