@@ -1,6 +1,4 @@
-import { useState } from "react";
-import { AppUser } from "@/data/products";
-import MeUpLogo from "@/components/inventory/MeUpLogo";
+import meupLogo from "@/assets/logo-meup.png";
 
 interface RoleSelectionProps {
   onSelectVendedor: () => void;
@@ -11,7 +9,7 @@ const RoleSelection = ({ onSelectVendedor, onSelectDistribuidor }: RoleSelection
   return (
     <div className="min-h-screen bg-landing flex flex-col items-center justify-center p-5">
       <div className="bg-card rounded-2xl px-7 py-3.5 mb-5 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
-        <MeUpLogo className="h-12" />
+        <img src={meupLogo} alt="MeUp" className="h-12" />
       </div>
       <h1 className="text-header-foreground text-[22px] font-extrabold mb-2 tracking-tight text-center">
         Portal de Inventario
