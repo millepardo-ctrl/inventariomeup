@@ -45,15 +45,15 @@ const ProductCard = ({ product: p, isVendedor }: ProductCardProps) => {
         <div
           className="rounded-lg px-2.5 py-1.5 text-center min-w-[70px]"
           style={{
-            backgroundColor: p.disp_baq > 0 ? `hsl(var(--cat-${catKey}-bg))` : undefined,
+            backgroundColor: p.disp_baq > 0 ? `hsl(var(--disp-baq-bg))` : undefined,
             borderWidth: 1,
-            borderColor: p.disp_baq > 0 ? `hsl(var(--cat-${catKey}) / 0.25)` : `hsl(var(--border))`,
+            borderColor: p.disp_baq > 0 ? `hsl(var(--disp-baq-border))` : `hsl(var(--border))`,
           }}
         >
-          <div className="text-[15px] font-extrabold font-mono text-foreground">
+          <div className="text-[15px] font-extrabold font-mono text-[hsl(var(--disp-baq-value))]">
             {fmt(p.disp_baq)}
           </div>
-          <div className="text-[10px] text-muted-foreground">🔵 B/quilla</div>
+          <div className="text-[10px] text-[hsl(var(--disp-baq-label))]">🟡 B/quilla</div>
         </div>
 
         {/* Disp Cúcuta */}
