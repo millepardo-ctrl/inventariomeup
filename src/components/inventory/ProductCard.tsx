@@ -37,7 +37,7 @@ const ProductCard = ({ product: p, isVendedor, isDistribuidor }: ProductCardProp
             >
               {p.cat}
             </span>
-            <span className="text-[10px] text-muted-foreground font-mono">{p.c}</span>
+            {!isDistribuidor && <span className="text-[10px] text-muted-foreground font-mono">{p.c}</span>}
           </div>
           <div className="text-[13px] font-semibold text-foreground leading-tight">{p.n}</div>
         </div>
