@@ -120,7 +120,7 @@ const Dashboard = ({ user, products, onLogout, refreshing, lastUpdated, onRefres
         {/* Product list */}
         <div className="flex flex-col gap-1.5">
           {filtered.map(p => (
-            <ProductCard key={p.c + p.cat} product={p} isVendedor={isVendedor} />
+            <ProductCard key={p.c + p.cat} product={p} isVendedor={isVendedor} isDistribuidor={!isVendedor} />
           ))}
           {filtered.length === 0 && (
             <div className="text-center py-16 text-muted-foreground">
