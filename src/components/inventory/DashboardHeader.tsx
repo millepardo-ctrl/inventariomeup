@@ -10,6 +10,12 @@ interface DashboardHeaderProps {
   onRefresh?: () => void;
 }
 
+const extractCompany = (email: string) => {
+  const domain = email.split("@")[1] || "";
+  const name = domain.split(".")[0];
+  return name.charAt(0).toUpperCase() + name.slice(1);
+};
+
 const DashboardHeader = ({ user, onLogout, refreshing, lastUpdated, onRefresh }: DashboardHeaderProps) => {
   const isVendedor = user.type === "vendedor";
   const timeStr = lastUpdated
@@ -51,13 +57,18 @@ const DashboardHeader = ({ user, onLogout, refreshing, lastUpdated, onRefresh }:
           </a>
         )}
 
-        {/* Role badge */}
+        {/* Greeting + Role badge */}
+        {!isVendedor && (
+          <span className="text-sm text-foreground font-semibold hidden sm:inline">
+            👋 Hola, <span className="capitalize">{extractCompany(user.email)}</span>
+          </span>
+        )}
         <div className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider border ${
           isVendedor
             ? "bg-[hsl(213,50%,25%)] text-primary border-primary/25"
             : "bg-[hsl(24,10%,11%)] text-[hsl(30,5%,64%)] border-[hsl(20,6%,26%)]"
         }`}>
-          {isVendedor ? "👤 Vendedor" : `🏪 ${user.name}`}
+          {isVendedor ? "👤 Vendedor" : `🏪 ${extractCompany(user.email)}`}
         </div>
 
         {/* Logout for distributors */}
