@@ -6,6 +6,7 @@ import EstadoBadge from "@/components/inventory/EstadoBadge";
 interface ProductCardProps {
   product: Product;
   isVendedor: boolean;
+  isDistribuidor?: boolean;
 }
 
 const ProductCard = ({ product: p, isVendedor }: ProductCardProps) => {
