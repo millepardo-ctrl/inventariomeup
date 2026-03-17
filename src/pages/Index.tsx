@@ -1,35 +1,11 @@
-import { useState } from "react";
-import { AppUser } from "@/data/products";
-import RoleSelection from "@/components/inventory/RoleSelection";
-import LoginScreen from "@/components/inventory/LoginScreen";
+import { useAuth } from "@/contexts/AuthContext";
 import Dashboard from "@/components/inventory/Dashboard";
 import { useGoogleSheetProducts } from "@/hooks/useGoogleSheetProducts";
 import logoMeup from "@/assets/logo-meup.png";
 
 const Index = () => {
-  const [user, setUser] = useState<AppUser | null>(null);
-  const [showLogin, setShowLogin] = useState(false);
+  const { user, logout, isAdmin } = useAuth();
   const { products, loading, refreshing, error, lastUpdated, refresh } = useGoogleSheetProducts();
-
-  if (!user && !showLogin) {
-    return (
-      <RoleSelection
-        onSelectVendedor={() => setUser({ type: "vendedor", name: "Equipo MeUp" })}
-        onSelectDistribuidor={() => setShowLogin(true)}
-      />
-    );
-  }
-
-  if (showLogin && !user) {
-    return (
-      <LoginScreen
-        onLogin={(u) => {
-          setUser(u);
-          setShowLogin(false);
-        }}
-      />
-    );
-  }
 
   if (loading) {
     return (
@@ -56,17 +32,21 @@ const Index = () => {
     );
   }
 
+  // Map auth user to the AppUser interface used by Dashboard
+  const appUser = {
+    type: isAdmin ? "vendedor" as const : "distribuidor" as const,
+    name: user!.nombre,
+    email: user!.email,
+  };
+
   return (
     <Dashboard
-      user={user!}
+      user={appUser}
       products={products}
       refreshing={refreshing}
       lastUpdated={lastUpdated}
       onRefresh={refresh}
-      onLogout={() => {
-        setUser(null);
-        setShowLogin(false);
-      }}
+      onLogout={logout}
     />
   );
 };
