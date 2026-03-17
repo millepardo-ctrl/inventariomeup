@@ -6,9 +6,10 @@ import EstadoBadge from "@/components/inventory/EstadoBadge";
 interface ProductCardProps {
   product: Product;
   isVendedor: boolean;
+  isDistribuidor?: boolean;
 }
 
-const ProductCard = ({ product: p, isVendedor }: ProductCardProps) => {
+const ProductCard = ({ product: p, isVendedor, isDistribuidor }: ProductCardProps) => {
   const [expanded, setExpanded] = useState(false);
   const catKey = CAT_KEY_MAP[p.cat];
   const hasNav = p.d1 > 0 || p.d2 > 0;
@@ -36,7 +37,7 @@ const ProductCard = ({ product: p, isVendedor }: ProductCardProps) => {
             >
               {p.cat}
             </span>
-            <span className="text-[10px] text-muted-foreground font-mono">{p.c}</span>
+            {!isDistribuidor && <span className="text-[10px] text-muted-foreground font-mono">{p.c}</span>}
           </div>
           <div className="text-[13px] font-semibold text-foreground leading-tight">{p.n}</div>
         </div>
