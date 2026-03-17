@@ -9,7 +9,7 @@ interface ProductCardProps {
   isDistribuidor?: boolean;
 }
 
-const ProductCard = ({ product: p, isVendedor }: ProductCardProps) => {
+const ProductCard = ({ product: p, isVendedor, isDistribuidor }: ProductCardProps) => {
   const [expanded, setExpanded] = useState(false);
   const catKey = CAT_KEY_MAP[p.cat];
   const hasNav = p.d1 > 0 || p.d2 > 0;
