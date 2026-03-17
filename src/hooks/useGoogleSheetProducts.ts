@@ -3,10 +3,10 @@ import { Product } from "@/data/products";
 import Papa from "papaparse";
 
 const SHEET_CSV =
-  "https://docs.google.com/spreadsheets/d/12SHVhcpfyOrCJjUaafNehAyhlo0hGdXv0458Xs9LSOI/export?format=csv&gid=846528846";
+  "https://docs.google.com/spreadsheets/d/12SHVhcpfyOrCJjUaafNehAyhlo0hGdXv0458Xs9LSOI/export?format=csv&gid=816037849";
 
 const NAV_CSV =
-  "https://docs.google.com/spreadsheets/d/12SHVhcpfyOrCJjUaafNehAyhlo0hGdXv0458Xs9LSOI/export?format=csv&gid=26483109";
+  "https://docs.google.com/spreadsheets/d/12SHVhcpfyOrCJjUaafNehAyhlo0hGdXv0458Xs9LSOI/export?format=csv&gid=1955739514";
 
 // Estados that map to Disp 1 (próximo a llegar)
 const DISP1_ESTADOS = new Set(["EN ADUANA", "EN PUERTO"]);
@@ -31,23 +31,26 @@ export function useGoogleSheetProducts() {
   const fetchData = useCallback((isManual = false) => {
     if (isManual) setRefreshing(true);
 
-    Promise.all([
-      fetch(SHEET_CSV).then((r) => r.text()),
-      fetch(NAV_CSV).then((r) => r.text()),
-    ])
+    Promise.all([fetch(SHEET_CSV).then((r) => r.text()), fetch(NAV_CSV).then((r) => r.text())])
       .then(([inventoryCsv, navCsv]) => {
         // Parse navegación data to build ETA/estado map per product code
         const navResult = Papa.parse(navCsv, { skipEmptyLines: true });
         const navRows = (navResult.data as string[][]).slice(2); // skip header rows
 
         // Group nav entries by code: { code -> { d1: {eta, estado}, d2: {eta, estado} } }
-        const navMap: Record<string, { eta1: string | null; est1: string | null; eta2: string | null; est2: string | null }> = {};
+        const navMap: Record<
+          string,
+          { eta1: string | null; est1: string | null; eta2: string | null; est2: string | null }
+        > = {};
 
         for (const cols of navRows) {
           const code = String(cols[1] || "").trim();
           if (!code.match(/^\d/)) continue;
           const eta = String(cols[6] || "").trim() || null;
-          const estado = String(cols[8] || "").trim().toUpperCase() || null;
+          const estado =
+            String(cols[8] || "")
+              .trim()
+              .toUpperCase() || null;
           if (!estado) continue;
 
           if (!navMap[code]) {
