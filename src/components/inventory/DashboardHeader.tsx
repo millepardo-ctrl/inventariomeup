@@ -10,6 +10,12 @@ interface DashboardHeaderProps {
   onRefresh?: () => void;
 }
 
+const extractCompany = (email: string) => {
+  const domain = email.split("@")[1] || "";
+  const name = domain.split(".")[0];
+  return name.charAt(0).toUpperCase() + name.slice(1);
+};
+
 const DashboardHeader = ({ user, onLogout, refreshing, lastUpdated, onRefresh }: DashboardHeaderProps) => {
   const isVendedor = user.type === "vendedor";
   const timeStr = lastUpdated
