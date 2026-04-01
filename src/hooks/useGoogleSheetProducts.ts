@@ -3,7 +3,7 @@ import { Product } from "@/data/products";
 import Papa from "papaparse";
 
 const SHEET_CSV =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7-yVomOaDuA9DyIWmpOZm_2X1HQ7PjoQ6yFklXrNlmQDzdyMVsB1FlH-dMF-jfg/pub?gid=816037849&single=true&output=csv";
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUPRpcZOfiruxTLEJ8i1D4jPfJmHNUQa_okeiS--pHPgpcfV4BqFLvvrmy1uumvA/pub?gid=1006196470&single=true&output=csv";
 
 const NAV_CSV =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7-yVomOaDuA9DyIWmpOZm_2X1HQ7PjoQ6yFklXrNlmQDzdyMVsB1FlH-dMF-jfg/pub?gid=1955739514&single=true&output=csv";
@@ -86,8 +86,12 @@ export function useGoogleSheetProducts() {
               pre_res: toNum(cols[9]),
               disp_cuc: toNum(cols[10]),
               disp_baq: toNum(cols[11]),
+              total_disp: toNum(cols[12]),
               d1: toNum(cols[13]),
               d2: toNum(cols[14]),
+              consumo: toNum(cols[16]),
+              stk_min: toNum(cols[17]),
+              alerta: String(cols[20] || "").trim() || null,
               eta1: nav?.eta1 ?? null,
               eta2: nav?.eta2 ?? null,
               est1: nav?.est1 ?? null,
