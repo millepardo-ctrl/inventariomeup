@@ -3,7 +3,7 @@ import { Product } from "@/data/products";
 import Papa from "papaparse";
 
 const SHEET_CSV =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7-yVomOaDuA9DyIWmpOZm_2X1HQ7PjoQ6yFklXrNlmQDzdyMVsB1FlH-dMF-jfg/pub?gid=816037849&single=true&output=csv";
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUPRpcZOfiruxTLEJ8i1D4jPfJmHNUQa_okeiS--pHPgpcfV4BqFLvvrmy1uumvA/pub?gid=1006196470&single=true&output=csv";
 
 const NAV_CSV =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7-yVomOaDuA9DyIWmpOZm_2X1HQ7PjoQ6yFklXrNlmQDzdyMVsB1FlH-dMF-jfg/pub?gid=1955739514&single=true&output=csv";
