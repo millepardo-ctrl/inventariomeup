@@ -7,6 +7,7 @@ export interface Product {
   stock_cuc: number;
   disp_baq: number;
   disp_cuc: number;
+  total_disp: number;
   d1: number;
   d2: number;
   eta1: string | null;
@@ -15,6 +16,9 @@ export interface Product {
   est2: string | null;
   res: number;
   pre_res: number;
+  consumo: number;
+  stk_min: number;
+  alerta: string | null;
 }
 
 export type Category = "Mármol" | "Travertino" | "Bali/Piedra" | "Granito" | "Piedra Natural" | "Splitface y Más" | "Pizarra" | "Accesorios" | "Complementarios";
