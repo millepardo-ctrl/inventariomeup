@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useCallback, type ReactNode } from
 import Papa from "papaparse";
 
 const USERS_CSV =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7-yVomOaDuA9DyIWmpOZm_2X1HQ7PjoQ6yFklXrNlmQDzdyMVsB1FlH-dMF-jfg/pub?gid=1067786151&single=true&output=csv";
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ0G2hjB-gsAREX7D1oHD6MyeE9nNTTQyDmKkILivohh6HALF1JIAbKrrWcePNmL3tqKqTO9Cfb8gWd/pub?gid=148554752&single=true&output=csv";
 
 export type UserRole = "admin" | "distribuidor";
 
