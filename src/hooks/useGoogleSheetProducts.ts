@@ -3,10 +3,10 @@ import { Product } from "@/data/products";
 import Papa from "papaparse";
 
 const SHEET_CSV =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ0G2hjB-gsAREX7D1oHD6MyeE9nNTTQyDmKkILivohh6HALF1JIAbKrrWcePNmL3tqKqTO9Cfb8gWd/pub?gid=1006196470&single=true&output=csv";
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRZcZ_HAFNOdIAXh8AvNqeiBM3fjfBLHUPYxz5u_WYPnwi_nKZ8N3lzpAnSLYRb6HNp46DHG0Z48mjZ/pub?gid=1640636152&single=true&output=csv";
 
 const NAV_CSV =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7-yVomOaDuA9DyIWmpOZm_2X1HQ7PjoQ6yFklXrNlmQDzdyMVsB1FlH-dMF-jfg/pub?gid=1955739514&single=true&output=csv";
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRZcZ_HAFNOdIAXh8AvNqeiBM3fjfBLHUPYxz5u_WYPnwi_nKZ8N3lzpAnSLYRb6HNp46DHG0Z48mjZ/pub?gid=2028185077&single=true&output=csv";
 
 // Estados that map to Disp 1 (próximo a llegar)
 const DISP1_ESTADOS = new Set(["EN ADUANA", "EN PUERTO"]);
