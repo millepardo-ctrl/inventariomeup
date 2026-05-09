@@ -8,6 +8,7 @@ interface DashboardHeaderProps {
   refreshing?: boolean;
   lastUpdated?: Date | null;
   onRefresh?: () => void;
+  onOpenBodega?: () => void;
 }
 
 const extractCompany = (email: string) => {
@@ -16,7 +17,7 @@ const extractCompany = (email: string) => {
   return name.charAt(0).toUpperCase() + name.slice(1);
 };
 
-const DashboardHeader = ({ user, onLogout, refreshing, lastUpdated, onRefresh }: DashboardHeaderProps) => {
+const DashboardHeader = ({ user, onLogout, refreshing, lastUpdated, onRefresh, onOpenBodega }: DashboardHeaderProps) => {
   const isVendedor = user.type === "vendedor";
   const timeStr = lastUpdated
     ? lastUpdated.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit", hour12: false })
@@ -55,6 +56,16 @@ const DashboardHeader = ({ user, onLogout, refreshing, lastUpdated, onRefresh }:
           >
             📊 Abrir Google Sheet
           </a>
+        )}
+
+        {/* Bodega view (admin only) */}
+        {isVendedor && onOpenBodega && (
+          <button
+            onClick={onOpenBodega}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[hsl(150,70%,18%)] border border-[hsl(150,70%,30%)] rounded-[9px] text-[hsl(150,70%,75%)] text-xs font-semibold hover:opacity-90 transition-opacity uppercase tracking-wider"
+          >
+            🏭 Bodega
+          </button>
         )}
 
         {/* Greeting + Role badge */}
