@@ -63,9 +63,30 @@ const getInvColor = (inv: string) => invoiceColors[inv] || defaultInvColor;
 
 const estadoPrioridad = (e: string) => {
   const s = (e || "").toUpperCase();
+  if (!s) return 4;
   if (s.includes("ADUANA") || s.includes("PUERTO")) return 1;
   if (s.includes("TRÁNSITO") || s.includes("TRANSITO")) return 2;
-  return 3;
+  if (s.includes("PRODUCCIÓN") || s.includes("PRODUCCION")) return 3;
+  return 4;
+};
+
+// Parsea fecha DD/MM/YYYY o D/M/YYYY a número comparable YYYYMMDD.
+// Si llega como número (serial Excel) lo usa directo. Vacío => al final.
+const parseFechaETA = (s: string): number => {
+  if (!s || !s.trim()) return 99999999;
+  const t = s.trim();
+  const parts = t.split("/");
+  if (parts.length === 3) {
+    const [d, m, y] = parts;
+    const dn = parseInt(d, 10);
+    const mn = parseInt(m, 10);
+    const yn = parseInt(y, 10);
+    if (!isNaN(dn) && !isNaN(mn) && !isNaN(yn)) {
+      return yn * 10000 + mn * 100 + dn;
+    }
+  }
+  const n = parseFloat(t.replace(",", "."));
+  return isNaN(n) ? 99999999 : n;
 };
 
 function estadoBadgeStyle(estado: string): { bg: string; fg: string; border: string } {
@@ -92,13 +113,20 @@ function verifBadge(v: string) {
 const inputCls =
   "w-full px-4 py-3 text-2xl font-mono font-bold border-2 border-[hsl(214,32%,80%)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[hsl(217,91%,60%)] focus:border-[hsl(217,91%,60%)]";
 
-const ContainerCard = ({ row, onSaved }: { row: Row; onSaved: () => void }) => {
+const ContainerCard = ({
+  row,
+  onLocalUpdate,
+}: {
+  row: Row;
+  onLocalUpdate: (rowNumber: number, conteo: string, verificacion: string) => void;
+}) => {
   const [val, setVal] = useState(row.conteo || "");
   const [saving, setSaving] = useState(false);
   const [feedback, setFeedback] = useState<{ tone: "ok" | "warn" | "err"; msg: string } | null>(null);
   const e = estadoBadgeStyle(row.estado);
   const vb = verifBadge(row.verificacion);
   const invoiceQty = Number(String(row.qty).replace(/\./g, "").replace(",", "."));
+  const hasSaved = (row.conteo || "").trim() !== "";
 
   const handleSave = async () => {
     const num = Number(String(val).replace(",", "."));
@@ -110,17 +138,20 @@ const ContainerCard = ({ row, onSaved }: { row: Row; onSaved: () => void }) => {
     setFeedback(null);
     try {
       await writeCell({ sheetId: NAV_SHEET_ID, cell: `M${row.rowNumber}` }, num);
+      const diffM2 = isFinite(invoiceQty) ? num - invoiceQty : 0;
       const diffPct = isFinite(invoiceQty) && invoiceQty > 0
-        ? Math.abs((num - invoiceQty) / invoiceQty * 100)
+        ? Math.abs(diffM2 / invoiceQty * 100)
         : 0;
       const pct = diffPct.toFixed(1);
+      const m2Str = `${diffM2 >= 0 ? "+" : ""}${diffM2.toLocaleString("es-CO", { maximumFractionDigits: 2 })}`;
+      const newVerif = diffPct <= 10 ? "✅ Auto-aprobado" : "⏳ Pend. aprobación";
       if (diffPct <= 10) {
-        setFeedback({ tone: "ok", msg: `✅ Auto-aprobado — diferencia de ${pct}%` });
+        setFeedback({ tone: "ok", msg: `✅ Auto-aprobado — Diferencia: ${m2Str} m² (${pct}%)` });
       } else {
-        setFeedback({ tone: "warn", msg: `⏳ Requiere aprobación — diferencia de ${pct}%` });
+        setFeedback({ tone: "warn", msg: `⏳ Requiere aprobación — Diferencia: ${m2Str} m² (${pct}%)` });
       }
       toast.success(`Conteo guardado para ${row.invoice}`);
-      setTimeout(onSaved, 1200);
+      onLocalUpdate(row.rowNumber, String(num), newVerif);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Error al guardar";
       setFeedback({ tone: "err", msg: `❌ ${msg}` });
@@ -200,8 +231,8 @@ const ContainerCard = ({ row, onSaved }: { row: Row; onSaved: () => void }) => {
         className="w-full bg-[hsl(217,91%,55%)] hover:bg-[hsl(217,91%,48%)] disabled:opacity-60 text-white text-lg font-bold rounded-xl flex items-center justify-center gap-2 transition-colors"
         style={{ minHeight: 56 }}
       >
-        {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : "💾"}
-        {saving ? "Guardando…" : "Guardar conteo"}
+        {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : hasSaved ? "✏️" : "💾"}
+        {saving ? "Guardando…" : hasSaved ? "Actualizar conteo" : "Guardar conteo"}
       </button>
     </div>
   );
