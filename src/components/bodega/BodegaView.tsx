@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, Loader2, RefreshCw } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronRight, Loader2, RefreshCw } from "lucide-react";
 import { writeCell } from "@/lib/googleSheets";
 import { toast } from "sonner";
 
@@ -20,6 +20,7 @@ interface Row {
   conteo: string;
   diferencia: string;
   verificacion: string;
+  etaNum: number;
 }
 
 function parseCsv(text: string): string[][] {
@@ -44,6 +45,28 @@ function parseCsv(text: string): string[][] {
   if (field.length || cur.length) { cur.push(field); rows.push(cur); }
   return rows;
 }
+
+const invoiceColors: Record<string, { bg: string; border: string; text: string }> = {
+  'INV-1035':  { bg: '#EFF6FF', border: '#3B82F6', text: '#1D4ED8' },
+  'INV-1043':  { bg: '#F0FDF4', border: '#10B981', text: '#065F46' },
+  'INV-012':   { bg: '#FFFBEB', border: '#F59E0B', text: '#92400E' },
+  'INV-013':   { bg: '#FFF7ED', border: '#FB923C', text: '#9A3412' },
+  'INV-046':   { bg: '#FDF4FF', border: '#A855F7', text: '#6B21A8' },
+  'INV-047':   { bg: '#F0FDFA', border: '#14B8A6', text: '#134E4A' },
+  'INV-1048':  { bg: '#EEF2FF', border: '#6366F1', text: '#3730A3' },
+  'INV-1054':  { bg: '#FFF1F2', border: '#F43F5E', text: '#881337' },
+  'PRSI0022026':{ bg: '#ECFEFF', border: '#06B6D4', text: '#164E63' },
+  'Dursun-May':{ bg: '#F7FEE7', border: '#65A30D', text: '#365314' },
+};
+const defaultInvColor = { bg: '#F8FAFC', border: '#94A3B8', text: '#334155' };
+const getInvColor = (inv: string) => invoiceColors[inv] || defaultInvColor;
+
+const estadoPrioridad = (e: string) => {
+  const s = (e || "").toUpperCase();
+  if (s.includes("ADUANA") || s.includes("PUERTO")) return 1;
+  if (s.includes("TRÁNSITO") || s.includes("TRANSITO")) return 2;
+  return 3;
+};
 
 function estadoBadgeStyle(estado: string): { bg: string; fg: string; border: string } {
   const s = estado.toUpperCase();
@@ -267,6 +290,12 @@ const BodegaView = ({ onBack, isAdmin }: { onBack: () => void; isAdmin: boolean 
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<"pendientes" | "aprobaciones">("pendientes");
   const [reloadKey, setReloadKey] = useState(0);
+  const [filterInvoice, setFilterInvoice] = useState<string>("__all__");
+  const [filterFabricante, setFilterFabricante] = useState<string>("__all__");
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+
+  const toggleGroup = (inv: string) =>
+    setCollapsed((c) => ({ ...c, [inv]: !c[inv] }));
 
   useEffect(() => {
     let cancelled = false;
@@ -291,13 +320,19 @@ const BodegaView = ({ onBack, isAdmin }: { onBack: () => void; isAdmin: boolean 
             conteo: (cols[12] || "").trim(),
             diferencia: (cols[13] || "").trim(),
             verificacion: (cols[14] || "").trim(),
+            etaNum: parseFloat((cols[11] || "").replace(",", ".")) || 999999,
           }))
           .filter(
             (r) =>
               r.bodega.toUpperCase().includes("BARRANQUILLA") &&
               r.estado.toUpperCase() !== "RECIBIDO" &&
               r.code.length > 0
-          );
+          )
+          .sort((a, b) => {
+            const ep = estadoPrioridad(a.estado) - estadoPrioridad(b.estado);
+            if (ep !== 0) return ep;
+            return a.etaNum - b.etaNum;
+          });
         if (!cancelled) {
           setRows(parsed);
           setLoading(false);
@@ -312,7 +347,35 @@ const BodegaView = ({ onBack, isAdmin }: { onBack: () => void; isAdmin: boolean 
     return () => { cancelled = true; };
   }, [reloadKey]);
 
-  const pendientes = rows;
+  const invoiceOptions = useMemo(
+    () => Array.from(new Set(rows.map((r) => r.invoice).filter(Boolean))),
+    [rows]
+  );
+  const fabricanteOptions = useMemo(
+    () => Array.from(new Set(rows.map((r) => r.proveedor).filter(Boolean))),
+    [rows]
+  );
+
+  const pendientes = useMemo(
+    () =>
+      rows.filter(
+        (r) =>
+          (filterInvoice === "__all__" || r.invoice === filterInvoice) &&
+          (filterFabricante === "__all__" || r.proveedor === filterFabricante)
+      ),
+    [rows, filterInvoice, filterFabricante]
+  );
+
+  const grouped = useMemo(() => {
+    const map = new Map<string, Row[]>();
+    for (const r of pendientes) {
+      const key = r.invoice || "—";
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(r);
+    }
+    return Array.from(map.entries());
+  }, [pendientes]);
+
   const aprobaciones = useMemo(
     () => rows.filter((r) => r.verificacion.includes("⏳")),
     [rows]
@@ -383,17 +446,117 @@ const BodegaView = ({ onBack, isAdmin }: { onBack: () => void; isAdmin: boolean 
           </div>
         )}
         {!loading && !error && tab === "pendientes" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {pendientes.map((r) => (
-              <ContainerCard key={`${r.rowNumber}-${r.invoice}`} row={r} onSaved={() => setReloadKey((k) => k + 1)} />
-            ))}
-            {pendientes.length === 0 && (
-              <div className="col-span-full text-center py-16 text-[hsl(215,16%,45%)]">
-                <div className="text-4xl mb-3">📭</div>
-                <div className="text-lg font-semibold">Sin contenedores pendientes</div>
+          <>
+            <div className="flex flex-wrap gap-3 mb-5 items-end">
+              <div className="flex flex-col">
+                <label className="text-xs font-bold uppercase tracking-wider text-[hsl(215,16%,40%)] mb-1">
+                  Invoice
+                </label>
+                <select
+                  value={filterInvoice}
+                  onChange={(e) => setFilterInvoice(e.target.value)}
+                  className="px-3 py-2 rounded-lg border-2 border-[hsl(214,32%,85%)] text-base font-semibold bg-white"
+                  style={{ minHeight: 44 }}
+                >
+                  <option value="__all__">Todos</option>
+                  {invoiceOptions.map((i) => (
+                    <option key={i} value={i}>{i}</option>
+                  ))}
+                </select>
               </div>
-            )}
-          </div>
+              <div className="flex flex-col">
+                <label className="text-xs font-bold uppercase tracking-wider text-[hsl(215,16%,40%)] mb-1">
+                  Fabricante
+                </label>
+                <select
+                  value={filterFabricante}
+                  onChange={(e) => setFilterFabricante(e.target.value)}
+                  className="px-3 py-2 rounded-lg border-2 border-[hsl(214,32%,85%)] text-base font-semibold bg-white"
+                  style={{ minHeight: 44 }}
+                >
+                  <option value="__all__">Todos</option>
+                  {fabricanteOptions.map((f) => (
+                    <option key={f} value={f}>{f}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="ml-auto text-sm font-semibold text-[hsl(215,16%,40%)]">
+                {pendientes.length} contenedor{pendientes.length === 1 ? "" : "es"} visible{pendientes.length === 1 ? "" : "s"}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-5">
+              {grouped.map(([invoice, items]) => {
+                const color = getInvColor(invoice);
+                const first = items[0];
+                const totalM2 = items.reduce(
+                  (sum, r) => sum + (Number(String(r.qty).replace(/\./g, "").replace(",", ".")) || 0),
+                  0
+                );
+                const isCollapsed = !!collapsed[invoice];
+                const eb = estadoBadgeStyle(first.estado);
+                return (
+                  <div key={invoice} className="flex flex-col gap-3">
+                    <button
+                      type="button"
+                      onClick={() => toggleGroup(invoice)}
+                      className="w-full flex items-center justify-between gap-3 px-5 py-4 rounded-xl text-left flex-wrap"
+                      style={{
+                        background: color.bg,
+                        borderLeft: `4px solid ${color.border}`,
+                      }}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        {isCollapsed ? (
+                          <ChevronRight className="w-5 h-5" style={{ color: color.text }} />
+                        ) : (
+                          <ChevronDown className="w-5 h-5" style={{ color: color.text }} />
+                        )}
+                        <div className="text-lg font-extrabold font-mono" style={{ color: color.text }}>
+                          #{invoice}
+                        </div>
+                        <div className="px-2 py-0.5 rounded-full text-xs font-bold bg-[hsl(210,20%,92%)] text-[hsl(215,16%,30%)]">
+                          🏭 {first.proveedor || "—"}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <div
+                          className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border"
+                          style={{ background: eb.bg, color: eb.fg, borderColor: eb.border }}
+                        >
+                          {first.estado || "—"}
+                        </div>
+                        <div className="text-xs font-semibold text-[hsl(215,16%,35%)]">
+                          📅 {first.eta || "—"}
+                        </div>
+                        <div className="text-xs font-bold" style={{ color: color.text }}>
+                          {items.length} producto{items.length === 1 ? "" : "s"} · {totalM2.toLocaleString("es-CO", { maximumFractionDigits: 2 })} m² total
+                        </div>
+                      </div>
+                    </button>
+
+                    {!isCollapsed && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-3" style={{ borderLeft: `4px solid ${color.border}` }}>
+                        {items.map((r) => (
+                          <ContainerCard
+                            key={`${r.rowNumber}-${r.invoice}`}
+                            row={r}
+                            onSaved={() => setReloadKey((k) => k + 1)}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+              {pendientes.length === 0 && (
+                <div className="text-center py-16 text-[hsl(215,16%,45%)]">
+                  <div className="text-4xl mb-3">📭</div>
+                  <div className="text-lg font-semibold">Sin contenedores pendientes</div>
+                </div>
+              )}
+            </div>
+          </>
         )}
         {!loading && !error && tab === "aprobaciones" && isAdmin && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
