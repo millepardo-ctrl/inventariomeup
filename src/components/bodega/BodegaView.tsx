@@ -622,6 +622,7 @@ const BodegaView = ({ onBack, isAdmin }: { onBack: () => void; isAdmin: boolean 
             )}
           </div>
         )}
+        {!loading && !error && tab === "pedidos" && isAdmin && <PedidosView />}
       </div>
     </div>
   );
