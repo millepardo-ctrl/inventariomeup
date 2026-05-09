@@ -290,6 +290,12 @@ const BodegaView = ({ onBack, isAdmin }: { onBack: () => void; isAdmin: boolean 
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<"pendientes" | "aprobaciones">("pendientes");
   const [reloadKey, setReloadKey] = useState(0);
+  const [filterInvoice, setFilterInvoice] = useState<string>("__all__");
+  const [filterFabricante, setFilterFabricante] = useState<string>("__all__");
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+
+  const toggleGroup = (inv: string) =>
+    setCollapsed((c) => ({ ...c, [inv]: !c[inv] }));
 
   useEffect(() => {
     let cancelled = false;
@@ -341,7 +347,35 @@ const BodegaView = ({ onBack, isAdmin }: { onBack: () => void; isAdmin: boolean 
     return () => { cancelled = true; };
   }, [reloadKey]);
 
-  const pendientes = rows;
+  const invoiceOptions = useMemo(
+    () => Array.from(new Set(rows.map((r) => r.invoice).filter(Boolean))),
+    [rows]
+  );
+  const fabricanteOptions = useMemo(
+    () => Array.from(new Set(rows.map((r) => r.proveedor).filter(Boolean))),
+    [rows]
+  );
+
+  const pendientes = useMemo(
+    () =>
+      rows.filter(
+        (r) =>
+          (filterInvoice === "__all__" || r.invoice === filterInvoice) &&
+          (filterFabricante === "__all__" || r.proveedor === filterFabricante)
+      ),
+    [rows, filterInvoice, filterFabricante]
+  );
+
+  const grouped = useMemo(() => {
+    const map = new Map<string, Row[]>();
+    for (const r of pendientes) {
+      const key = r.invoice || "—";
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(r);
+    }
+    return Array.from(map.entries());
+  }, [pendientes]);
+
   const aprobaciones = useMemo(
     () => rows.filter((r) => r.verificacion.includes("⏳")),
     [rows]
