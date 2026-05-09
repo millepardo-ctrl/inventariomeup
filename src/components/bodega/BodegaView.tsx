@@ -125,7 +125,7 @@ const ContainerCard = ({
   const [feedback, setFeedback] = useState<{ tone: "ok" | "warn" | "err"; msg: string } | null>(null);
   const e = estadoBadgeStyle(row.estado);
   const vb = verifBadge(row.verificacion);
-  const invoiceQty = Number(String(row.qty).replace(/\./g, "").replace(",", "."));
+  const invoiceQty = parseFloat(String(row.qty).replace(",", ".")) || 0;
   const hasSaved = (row.conteo || "").trim() !== "";
 
   const handleSave = async () => {
@@ -138,18 +138,17 @@ const ContainerCard = ({
     setFeedback(null);
     try {
       await writeCell({ sheetId: NAV_SHEET_ID, cell: `M${row.rowNumber}` }, num);
-      const diffM2 = isFinite(invoiceQty) ? num - invoiceQty : 0;
-      const diffPct = isFinite(invoiceQty) && invoiceQty > 0
-        ? Math.abs(diffM2 / invoiceQty * 100)
-        : 0;
-      const pct = diffPct.toFixed(1);
-      const m2Str = `${diffM2 >= 0 ? "+" : ""}${diffM2.toLocaleString("es-CO", { maximumFractionDigits: 2 })}`;
-      const newVerif = diffPct <= 10 ? "✅ Auto-aprobado" : "⏳ Pend. aprobación";
-      if (diffPct <= 10) {
-        setFeedback({ tone: "ok", msg: `✅ Auto-aprobado — Diferencia: ${m2Str} m² (${pct}%)` });
-      } else {
-        setFeedback({ tone: "warn", msg: `⏳ Requiere aprobación — Diferencia: ${m2Str} m² (${pct}%)` });
-      }
+      const diferencia = num - invoiceQty;
+      const diferenciaPct = invoiceQty > 0 ? Math.abs(diferencia / invoiceQty) * 100 : 0;
+      const requiereAprobacion = diferenciaPct > 10;
+      const m2Str = `${diferencia > 0 ? "+" : ""}${diferencia.toFixed(1)}`;
+      const pct = diferenciaPct.toFixed(1);
+      const newVerif = requiereAprobacion ? "⏳ Pend. aprobación" : "✅ Auto-aprobado";
+      setFeedback(
+        requiereAprobacion
+          ? { tone: "warn", msg: `⏳ Requiere aprobación — Diferencia: ${m2Str} m² (${pct}%)` }
+          : { tone: "ok", msg: `✅ Auto-aprobado — Diferencia: ${m2Str} m² (${pct}%)` }
+      );
       toast.success(`Conteo guardado para ${row.invoice}`);
       onLocalUpdate(row.rowNumber, String(num), newVerif);
     } catch (err) {
