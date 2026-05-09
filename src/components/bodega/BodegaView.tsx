@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, ChevronDown, ChevronRight, Loader2, RefreshCw } from "lucide-react";
 import { writeCell } from "@/lib/googleSheets";
 import { toast } from "sonner";
+import PedidosView from "./PedidosView";
 
 const NAV_CSV =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vRZcZ_HAFNOdIAXh8AvNqeiBM3fjfBLHUPYxz5u_WYPnwi_nKZ8N3lzpAnSLYRb6HNp46DHG0Z48mjZ/pub?gid=2028185077&single=true&output=csv";
@@ -325,7 +326,7 @@ const BodegaView = ({ onBack, isAdmin }: { onBack: () => void; isAdmin: boolean 
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [tab, setTab] = useState<"pendientes" | "aprobaciones">("pendientes");
+  const [tab, setTab] = useState<"pendientes" | "aprobaciones" | "pedidos">("pendientes");
   const [reloadKey, setReloadKey] = useState(0);
   const [filterInvoice, setFilterInvoice] = useState<string>("__all__");
   const [filterFabricante, setFilterFabricante] = useState<string>("__all__");
@@ -465,6 +466,16 @@ const BodegaView = ({ onBack, isAdmin }: { onBack: () => void; isAdmin: boolean 
               }`}
             >
               ⏳ Aprobaciones ({aprobaciones.length})
+            </button>
+            <button
+              onClick={() => setTab("pedidos")}
+              className={`px-4 py-2 rounded-lg text-sm font-bold ${
+                tab === "pedidos"
+                  ? "bg-[hsl(222,47%,18%)] text-white"
+                  : "bg-[hsl(210,20%,95%)] text-[hsl(215,16%,40%)]"
+              }`}
+            >
+              📋 Pedidos
             </button>
           </div>
         )}
