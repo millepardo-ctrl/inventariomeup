@@ -2,6 +2,8 @@ import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { Product, CAT_KEY_MAP, fmt } from "@/data/products";
 import EstadoBadge from "@/components/inventory/EstadoBadge";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface ProductCardProps {
   product: Product;
@@ -11,10 +13,34 @@ interface ProductCardProps {
 
 const ProductCard = ({ product: p, isVendedor, isDistribuidor }: ProductCardProps) => {
   const [expanded, setExpanded] = useState(false);
+  const [conteo, setConteo] = useState("");
+  const [saving, setSaving] = useState(false);
   const catKey = CAT_KEY_MAP[p.cat];
   const hasNav = p.d1 > 0 || p.d2 > 0;
   const hasReservas = isVendedor && p.res > 0;
   const hasPreRes = isVendedor && p.pre_res > 0;
+
+  const handleSendConteo = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (conteo === "" || isNaN(Number(conteo))) {
+      toast.error("Ingresa un número válido");
+      return;
+    }
+    setSaving(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("write-conteo", {
+        body: { code: p.c, conteo: Number(conteo) },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      toast.success(`Conteo guardado para ${p.c}`);
+      setConteo("");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Error al guardar");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div
@@ -187,6 +213,31 @@ const ProductCard = ({ product: p, isVendedor, isDistribuidor }: ProductCardProp
               </div>
             )}
           </div>
+
+          {isVendedor && (
+            <div
+              className="mt-2.5 p-3 rounded-[10px] bg-card border border-border flex items-center gap-2"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap">
+                📋 Conteo físico
+              </div>
+              <input
+                type="number"
+                value={conteo}
+                onChange={(e) => setConteo(e.target.value)}
+                placeholder={`0 ${p.u}`}
+                className="flex-1 min-w-0 px-2 py-1.5 text-sm font-mono bg-background border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
+              />
+              <button
+                onClick={handleSendConteo}
+                disabled={saving}
+                className="px-3 py-1.5 text-xs font-semibold bg-primary text-primary-foreground rounded-md hover:opacity-90 disabled:opacity-50 whitespace-nowrap"
+              >
+                {saving ? "Guardando…" : "Enviar"}
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
