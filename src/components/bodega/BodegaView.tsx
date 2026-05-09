@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, Loader2, RefreshCw } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronRight, Loader2, RefreshCw } from "lucide-react";
 import { writeCell } from "@/lib/googleSheets";
 import { toast } from "sonner";
 
@@ -20,6 +20,7 @@ interface Row {
   conteo: string;
   diferencia: string;
   verificacion: string;
+  etaNum: number;
 }
 
 function parseCsv(text: string): string[][] {
@@ -44,6 +45,28 @@ function parseCsv(text: string): string[][] {
   if (field.length || cur.length) { cur.push(field); rows.push(cur); }
   return rows;
 }
+
+const invoiceColors: Record<string, { bg: string; border: string; text: string }> = {
+  'INV-1035':  { bg: '#EFF6FF', border: '#3B82F6', text: '#1D4ED8' },
+  'INV-1043':  { bg: '#F0FDF4', border: '#10B981', text: '#065F46' },
+  'INV-012':   { bg: '#FFFBEB', border: '#F59E0B', text: '#92400E' },
+  'INV-013':   { bg: '#FFF7ED', border: '#FB923C', text: '#9A3412' },
+  'INV-046':   { bg: '#FDF4FF', border: '#A855F7', text: '#6B21A8' },
+  'INV-047':   { bg: '#F0FDFA', border: '#14B8A6', text: '#134E4A' },
+  'INV-1048':  { bg: '#EEF2FF', border: '#6366F1', text: '#3730A3' },
+  'INV-1054':  { bg: '#FFF1F2', border: '#F43F5E', text: '#881337' },
+  'PRSI0022026':{ bg: '#ECFEFF', border: '#06B6D4', text: '#164E63' },
+  'Dursun-May':{ bg: '#F7FEE7', border: '#65A30D', text: '#365314' },
+};
+const defaultInvColor = { bg: '#F8FAFC', border: '#94A3B8', text: '#334155' };
+const getInvColor = (inv: string) => invoiceColors[inv] || defaultInvColor;
+
+const estadoPrioridad = (e: string) => {
+  const s = (e || "").toUpperCase();
+  if (s.includes("ADUANA") || s.includes("PUERTO")) return 1;
+  if (s.includes("TRÁNSITO") || s.includes("TRANSITO")) return 2;
+  return 3;
+};
 
 function estadoBadgeStyle(estado: string): { bg: string; fg: string; border: string } {
   const s = estado.toUpperCase();
