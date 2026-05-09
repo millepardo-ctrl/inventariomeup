@@ -5,8 +5,7 @@ import { toast } from "sonner";
 
 const NAV_CSV =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vRZcZ_HAFNOdIAXh8AvNqeiBM3fjfBLHUPYxz5u_WYPnwi_nKZ8N3lzpAnSLYRb6HNp46DHG0Z48mjZ/pub?gid=2028185077&single=true&output=csv";
-// Nombre exacto del tab en Google Sheets (sin emoji para evitar fallos de parseo de la API)
-const SHEET_RANGE_PREFIX = "NAVEGACIÓN";
+const NAV_SHEET_ID = 2028185077;
 
 interface Row {
   rowNumber: number; // 1-based sheet row
@@ -87,7 +86,7 @@ const ContainerCard = ({ row, onSaved }: { row: Row; onSaved: () => void }) => {
     setSaving(true);
     setFeedback(null);
     try {
-      await writeCell(`${SHEET_RANGE_PREFIX}!M${row.rowNumber}`, num);
+      await writeCell({ sheetId: NAV_SHEET_ID, cell: `M${row.rowNumber}` }, num);
       const diffPct = isFinite(invoiceQty) && invoiceQty > 0
         ? Math.abs((num - invoiceQty) / invoiceQty * 100)
         : 0;
@@ -196,7 +195,7 @@ const ApprovalCard = ({ row, onAction }: { row: Row; onAction: () => void }) => 
   const approve = async () => {
     setBusy("ok");
     try {
-      await writeCell(`${SHEET_RANGE_PREFIX}!O${row.rowNumber}`, "✅ Aprobado");
+      await writeCell({ sheetId: NAV_SHEET_ID, cell: `O${row.rowNumber}` }, "✅ Aprobado");
       toast.success(`Aprobado #${row.invoice}`);
       onAction();
     } catch (e) {
@@ -208,7 +207,7 @@ const ApprovalCard = ({ row, onAction }: { row: Row; onAction: () => void }) => 
   const reject = async () => {
     setBusy("no");
     try {
-      await writeCell(`${SHEET_RANGE_PREFIX}!M${row.rowNumber}`, "");
+      await writeCell({ sheetId: NAV_SHEET_ID, cell: `M${row.rowNumber}` }, "");
       toast.success(`Rechazado #${row.invoice}`);
       onAction();
     } catch (e) {

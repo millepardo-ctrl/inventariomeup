@@ -56,6 +56,36 @@ async function getAccessToken(sa: { client_email: string; private_key: string })
   return data.access_token as string;
 }
 
+async function getSheetTitle(token: string, spreadsheetId: string, sheetId: number): Promise<string> {
+  const metaUrl = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?fields=sheets(properties(sheetId,title))`;
+  const metaRes = await fetch(metaUrl, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const metaData = await metaRes.json();
+  if (!metaRes.ok) throw new Error(`Metadata failed: ${JSON.stringify(metaData)}`);
+
+  const match = metaData?.sheets?.find(
+    (sheet: { properties?: { sheetId?: number; title?: string } }) =>
+      sheet?.properties?.sheetId === sheetId,
+  );
+
+  if (!match?.properties?.title) {
+    throw new Error(`Sheet with id ${sheetId} not found`);
+  }
+
+  return match.properties.title;
+}
+
+function toA1Range(sheetTitle: string, cell: string): string {
+  const normalizedCell = String(cell ?? "").trim().toUpperCase();
+  if (!/^[A-Z]+[1-9]\d*$/.test(normalizedCell)) {
+    throw new Error(`Invalid cell reference: ${cell}`);
+  }
+
+  const escapedTitle = sheetTitle.replace(/'/g, "''");
+  return `'${escapedTitle}'!${normalizedCell}`;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -68,29 +98,35 @@ Deno.serve(async (req) => {
 
     const sa = JSON.parse(SA_JSON);
     const body = await req.json();
-    // range example: "'🚢 NAVEGACIÓN'!M5"
-    const { range, value } = body ?? {};
-    if (!range) {
-      return new Response(JSON.stringify({ error: "range is required" }), {
+    const { range, value, sheetId, cell } = body ?? {};
+    if (!range && (sheetId === undefined || !cell)) {
+      return new Response(JSON.stringify({ error: "range or (sheetId and cell) is required" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     const token = await getAccessToken(sa);
-    const writeUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(range)}?valueInputOption=USER_ENTERED`;
+    const targetRange = range
+      ? String(range)
+      : toA1Range(await getSheetTitle(token, SHEET_ID, Number(sheetId)), String(cell));
+
+    const writeUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values:batchUpdate`;
     const writeRes = await fetch(writeUrl, {
-      method: "PUT",
+      method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ values: [[value ?? ""]] }),
+      body: JSON.stringify({
+        valueInputOption: "USER_ENTERED",
+        data: [{ range: targetRange, values: [[value ?? ""]] }],
+      }),
     });
     const writeData = await writeRes.json();
     if (!writeRes.ok) throw new Error(`Write failed: ${JSON.stringify(writeData)}`);
 
-    return new Response(JSON.stringify({ success: true, range, value }), {
+    return new Response(JSON.stringify({ success: true, range: targetRange, value }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
