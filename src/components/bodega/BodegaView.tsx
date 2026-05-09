@@ -239,9 +239,9 @@ const ContainerCard = ({
 
 const ApprovalCard = ({ row, onAction }: { row: Row; onAction: () => void }) => {
   const [busy, setBusy] = useState<null | "ok" | "no">(null);
-  const invoiceQty = Number(String(row.qty).replace(/\./g, "").replace(",", "."));
-  const conteoNum = Number(String(row.conteo).replace(/\./g, "").replace(",", "."));
-  const diff = isFinite(invoiceQty) && invoiceQty > 0 && isFinite(conteoNum)
+  const invoiceQty = parseFloat(String(row.qty).replace(",", ".")) || 0;
+  const conteoNum = parseFloat(String(row.conteo).replace(",", ".")) || 0;
+  const diff = invoiceQty > 0
     ? Math.abs((conteoNum - invoiceQty) / invoiceQty * 100).toFixed(1)
     : "—";
 
