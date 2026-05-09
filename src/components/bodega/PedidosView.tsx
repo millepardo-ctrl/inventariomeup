@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ChevronDown, ChevronRight, Loader2 } from "lucide-react";
+import { ChevronDown, ChevronRight, Loader2, Search } from "lucide-react";
 
 const PEDIDOS_CSV =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vRZcZ_HAFNOdIAXh8AvNqeiBM3fjfBLHUPYxz5u_WYPnwi_nKZ8N3lzpAnSLYRb6HNp46DHG0Z48mjZ/pub?gid=1049881921&single=true&output=csv";
@@ -95,6 +95,7 @@ const PedidosView = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -144,13 +145,23 @@ const PedidosView = () => {
     return Array.from(map.entries()).sort((a, b) => {
       const fa = parseFecha(a[1][0]?.fecha || "");
       const fb = parseFecha(b[1][0]?.fecha || "");
-      return fa.getTime() - fb.getTime();
+      return fb.getTime() - fa.getTime();
     });
   }, [pedidos]);
 
-  const totalIds = grouped.length;
-  const totalSinDesp = pedidos.filter((p) => isSinDespachar(p.estado)).length;
-  const totalPre = pedidos.filter((p) => isPreReserva(p.estado)).length;
+  const filteredGroups = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return grouped;
+    return grouped.filter(([id]) => id.toLowerCase().includes(q));
+  }, [grouped, query]);
+
+  const totalIds = filteredGroups.length;
+  const visiblePedidos = useMemo(
+    () => filteredGroups.flatMap(([, items]) => items),
+    [filteredGroups]
+  );
+  const totalSinDesp = visiblePedidos.filter((p) => isSinDespachar(p.estado)).length;
+  const totalPre = visiblePedidos.filter((p) => isPreReserva(p.estado)).length;
 
   const toggle = (id: string) => setCollapsed((c) => ({ ...c, [id]: !c[id] }));
 
@@ -190,8 +201,20 @@ const PedidosView = () => {
         </div>
       </div>
 
+      <div className="relative mb-4">
+        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[hsl(215,16%,50%)] pointer-events-none" />
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Buscar por ID de compra..."
+          className="w-full pl-10 pr-4 py-2.5 rounded-lg border-2 border-[hsl(214,32%,85%)] text-base font-semibold bg-white focus:outline-none focus:border-[hsl(217,91%,55%)]"
+          style={{ minHeight: 44 }}
+        />
+      </div>
+
       <div className="flex flex-col gap-4">
-        {grouped.map(([idCompra, items]) => {
+        {filteredGroups.map(([idCompra, items]) => {
           const hasPre = items.some((i) => isPreReserva(i.estado));
           const hasSin = items.some((i) => isSinDespachar(i.estado));
           const isMixto = hasPre && hasSin;
@@ -213,7 +236,7 @@ const PedidosView = () => {
                     <ChevronDown className="w-5 h-5 text-[hsl(215,16%,40%)]" />
                   )}
                   <div className="text-lg font-extrabold font-mono text-[hsl(222,47%,11%)]">
-                    #{idCompra}
+                    ID {idCompra}
                   </div>
                   <div className="text-xs font-semibold text-[hsl(215,16%,40%)]">
                     📅 {formatFecha(items[0]?.fecha || "")}
@@ -280,10 +303,12 @@ const PedidosView = () => {
             </div>
           );
         })}
-        {grouped.length === 0 && (
+        {filteredGroups.length === 0 && (
           <div className="text-center py-16 text-[hsl(215,16%,45%)]">
             <div className="text-4xl mb-3">📭</div>
-            <div className="text-lg font-semibold">Sin pedidos activos</div>
+            <div className="text-lg font-semibold">
+              {query.trim() ? "No se encontraron pedidos con ese ID" : "Sin pedidos activos"}
+            </div>
           </div>
         )}
       </div>
