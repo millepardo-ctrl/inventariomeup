@@ -33,6 +33,26 @@ export function useGoogleSheetProducts() {
 
     Promise.all([fetch(SHEET_CSV).then((r) => r.text()), fetch(NAV_CSV).then((r) => r.text())])
       .then(([inventoryCsv, navCsv]) => {
+        // === DIAGNÓSTICO CSV INVENTARIO ===
+        const csv = inventoryCsv;
+        console.log("=== DIAGNÓSTICO CSV INVENTARIO ===");
+        const lines = csv.split("\n");
+        console.log("Total líneas:", lines.length);
+        console.log("Línea 0 (fila 1):", lines[0]?.substring(0, 80));
+        console.log("Línea 3 (fila 4 = headers):", lines[3]?.substring(0, 200));
+        console.log("Línea 4 (fila 5):", lines[4]?.substring(0, 100));
+        console.log("Línea 5 (fila 6 = 1er producto):", lines[5]?.substring(0, 200));
+        const cols_test = lines[5]?.split(",");
+        if (cols_test) {
+          console.log("cols[0] código:", cols_test[0]);
+          console.log("cols[7] stock BAQ:", cols_test[7]);
+          console.log("cols[12] total disp:", cols_test[12]);
+          console.log("cols[13] disp1:", cols_test[13]);
+          console.log("cols[14] disp2:", cols_test[14]);
+          console.log("cols[15] total nav:", cols_test[15]);
+          console.log("cols[20] alerta:", cols_test[20]);
+        }
+
         // Parse navegación data to build ETA/estado map per product code
         const navResult = Papa.parse(navCsv, { skipEmptyLines: true });
         const navRows = (navResult.data as string[][]).slice(2); // skip header rows
