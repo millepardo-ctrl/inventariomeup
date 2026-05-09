@@ -314,13 +314,19 @@ const BodegaView = ({ onBack, isAdmin }: { onBack: () => void; isAdmin: boolean 
             conteo: (cols[12] || "").trim(),
             diferencia: (cols[13] || "").trim(),
             verificacion: (cols[14] || "").trim(),
+            etaNum: parseFloat((cols[11] || "").replace(",", ".")) || 999999,
           }))
           .filter(
             (r) =>
               r.bodega.toUpperCase().includes("BARRANQUILLA") &&
               r.estado.toUpperCase() !== "RECIBIDO" &&
               r.code.length > 0
-          );
+          )
+          .sort((a, b) => {
+            const ep = estadoPrioridad(a.estado) - estadoPrioridad(b.estado);
+            if (ep !== 0) return ep;
+            return a.etaNum - b.etaNum;
+          });
         if (!cancelled) {
           setRows(parsed);
           setLoading(false);
