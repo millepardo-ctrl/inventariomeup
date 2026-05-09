@@ -520,7 +520,7 @@ const BodegaView = ({ onBack, isAdmin }: { onBack: () => void; isAdmin: boolean 
                 const color = getInvColor(invoice);
                 const first = items[0];
                 const totalM2 = items.reduce(
-                  (sum, r) => sum + (Number(String(r.qty).replace(/\./g, "").replace(",", ".")) || 0),
+                  (sum, r) => sum + (parseFloat(String(r.qty || "0").replace(",", ".")) || 0),
                   0
                 );
                 const isCollapsed = !!collapsed[invoice];
@@ -560,7 +560,7 @@ const BodegaView = ({ onBack, isAdmin }: { onBack: () => void; isAdmin: boolean 
                           📅 {first.eta || "—"}
                         </div>
                         <div className="text-xs font-bold" style={{ color: color.text }}>
-                          {items.length} producto{items.length === 1 ? "" : "s"} · {totalM2.toLocaleString("es-CO", { maximumFractionDigits: 2 })} m² total
+                          {items.length} producto{items.length === 1 ? "" : "s"} · {totalM2.toLocaleString("es-CO", { maximumFractionDigits: 1 })} m² total
                         </div>
                       </div>
                     </button>
