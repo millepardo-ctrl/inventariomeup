@@ -89,6 +89,13 @@ const parseFechaETA = (s: string): number => {
   return isNaN(n) ? 99999999 : n;
 };
 
+// Parsea cantidades del CSV en formato americano: "1,050.0" -> 1050, "836.26" -> 836.26
+const parsearCantidad = (s: unknown): number => {
+  if (s === null || s === undefined) return 0;
+  const limpio = s.toString().trim().replace(/,(?=\d{3})/g, "");
+  return parseFloat(limpio) || 0;
+};
+
 function estadoBadgeStyle(estado: string): { bg: string; fg: string; border: string } {
   const s = estado.toUpperCase();
   if (s.includes("TRÁNSITO") || s.includes("TRANSITO"))
@@ -125,7 +132,7 @@ const ContainerCard = ({
   const [feedback, setFeedback] = useState<{ tone: "ok" | "warn" | "err"; msg: string } | null>(null);
   const e = estadoBadgeStyle(row.estado);
   const vb = verifBadge(row.verificacion);
-  const invoiceQty = parseFloat(String(row.qty).replace(",", ".")) || 0;
+  const invoiceQty = parsearCantidad(row.qty);
   const hasSaved = (row.conteo || "").trim() !== "";
 
   const handleSave = async () => {
@@ -191,7 +198,7 @@ const ContainerCard = ({
 
       <div className="bg-[hsl(214,95%,95%)] border border-[hsl(214,80%,85%)] rounded-xl px-4 py-3">
         <div className="text-xs uppercase tracking-widest text-[hsl(224,73%,33%)] font-bold">📦 Según invoice</div>
-        <div className="text-3xl font-black font-mono text-[hsl(224,76%,38%)] mt-1">{row.qty || "—"} <span className="text-base font-bold">m²</span></div>
+        <div className="text-3xl font-black font-mono text-[hsl(224,76%,38%)] mt-1">{row.qty ? parsearCantidad(row.qty).toLocaleString("es-CO", { maximumFractionDigits: 2 }) : "—"} <span className="text-base font-bold">m²</span></div>
       </div>
 
       <div>
@@ -239,8 +246,8 @@ const ContainerCard = ({
 
 const ApprovalCard = ({ row, onAction }: { row: Row; onAction: () => void }) => {
   const [busy, setBusy] = useState<null | "ok" | "no">(null);
-  const invoiceQty = parseFloat(String(row.qty).replace(",", ".")) || 0;
-  const conteoNum = parseFloat(String(row.conteo).replace(",", ".")) || 0;
+  const invoiceQty = parsearCantidad(row.qty);
+  const conteoNum = parsearCantidad(row.conteo);
   const diff = invoiceQty > 0
     ? Math.abs((conteoNum - invoiceQty) / invoiceQty * 100).toFixed(1)
     : "—";
@@ -285,11 +292,11 @@ const ApprovalCard = ({ row, onAction }: { row: Row; onAction: () => void }) => 
       <div className="grid grid-cols-2 gap-3 text-sm">
         <div className="bg-[hsl(214,95%,95%)] rounded-lg px-3 py-2">
           <div className="text-[10px] uppercase font-bold text-[hsl(224,73%,33%)]">Invoice</div>
-          <div className="text-lg font-mono font-bold">{row.qty} m²</div>
+          <div className="text-lg font-mono font-bold">{parsearCantidad(row.qty).toLocaleString("es-CO", { maximumFractionDigits: 2 })} m²</div>
         </div>
         <div className="bg-[hsl(45,93%,92%)] rounded-lg px-3 py-2">
           <div className="text-[10px] uppercase font-bold text-[hsl(38,90%,30%)]">Conteo</div>
-          <div className="text-lg font-mono font-bold">{row.conteo} m²</div>
+          <div className="text-lg font-mono font-bold">{parsearCantidad(row.conteo).toLocaleString("es-CO", { maximumFractionDigits: 2 })} m²</div>
         </div>
       </div>
       <div className="flex gap-2">
@@ -519,10 +526,7 @@ const BodegaView = ({ onBack, isAdmin }: { onBack: () => void; isAdmin: boolean 
               {grouped.map(([invoice, items]) => {
                 const color = getInvColor(invoice);
                 const first = items[0];
-                const totalM2 = items.reduce(
-                  (sum, r) => sum + (parseFloat(String(r.qty || "0").replace(",", ".")) || 0),
-                  0
-                );
+                const totalM2 = items.reduce((sum, r) => sum + parsearCantidad(r.qty), 0);
                 const isCollapsed = !!collapsed[invoice];
                 const eb = estadoBadgeStyle(first.estado);
                 return (
