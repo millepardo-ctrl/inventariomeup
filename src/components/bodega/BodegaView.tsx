@@ -4,7 +4,7 @@ import { writeCell } from "@/lib/googleSheets";
 import { toast } from "sonner";
 
 const NAV_CSV =
-  "https://docs.google.com/spreadsheets/d/1rX8peWpyG_sReE54vPOpWyu42VFa9Kve_LcQoImlUXo/export?format=csv&gid=153612214";
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRZcZ_HAFNOdIAXh8AvNqeiBM3fjfBLHUPYxz5u_WYPnwi_nKZ8N3lzpAnSLYRb6HNp46DHG0Z48mjZ/pub?gid=2028185077&single=true&output=csv";
 const SHEET_RANGE_PREFIX = "'🚢 NAVEGACIÓN'";
 
 interface Row {
