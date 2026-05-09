@@ -70,7 +70,7 @@ Deno.serve(async (req) => {
 
     const sa = JSON.parse(SA_JSON);
     const body = await req.json();
-    const { code, conteo, sheetName = "NAVEGACION" } = body ?? {};
+    const { code, conteo, sheetName = "NAVEGACIÓN" } = body ?? {};
 
     if (!code || conteo === undefined || conteo === null) {
       return new Response(
