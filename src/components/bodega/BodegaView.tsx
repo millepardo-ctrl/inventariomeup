@@ -5,7 +5,8 @@ import { toast } from "sonner";
 
 const NAV_CSV =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vRZcZ_HAFNOdIAXh8AvNqeiBM3fjfBLHUPYxz5u_WYPnwi_nKZ8N3lzpAnSLYRb6HNp46DHG0Z48mjZ/pub?gid=2028185077&single=true&output=csv";
-const SHEET_RANGE_PREFIX = "'🚢 NAVEGACIÓN'";
+// Nombre exacto del tab en Google Sheets (sin emoji para evitar fallos de parseo de la API)
+const SHEET_RANGE_PREFIX = "NAVEGACIÓN";
 
 interface Row {
   rowNumber: number; // 1-based sheet row
