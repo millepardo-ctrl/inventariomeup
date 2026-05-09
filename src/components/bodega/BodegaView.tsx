@@ -446,17 +446,117 @@ const BodegaView = ({ onBack, isAdmin }: { onBack: () => void; isAdmin: boolean 
           </div>
         )}
         {!loading && !error && tab === "pendientes" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {pendientes.map((r) => (
-              <ContainerCard key={`${r.rowNumber}-${r.invoice}`} row={r} onSaved={() => setReloadKey((k) => k + 1)} />
-            ))}
-            {pendientes.length === 0 && (
-              <div className="col-span-full text-center py-16 text-[hsl(215,16%,45%)]">
-                <div className="text-4xl mb-3">📭</div>
-                <div className="text-lg font-semibold">Sin contenedores pendientes</div>
+          <>
+            <div className="flex flex-wrap gap-3 mb-5 items-end">
+              <div className="flex flex-col">
+                <label className="text-xs font-bold uppercase tracking-wider text-[hsl(215,16%,40%)] mb-1">
+                  Invoice
+                </label>
+                <select
+                  value={filterInvoice}
+                  onChange={(e) => setFilterInvoice(e.target.value)}
+                  className="px-3 py-2 rounded-lg border-2 border-[hsl(214,32%,85%)] text-base font-semibold bg-white"
+                  style={{ minHeight: 44 }}
+                >
+                  <option value="__all__">Todos</option>
+                  {invoiceOptions.map((i) => (
+                    <option key={i} value={i}>{i}</option>
+                  ))}
+                </select>
               </div>
-            )}
-          </div>
+              <div className="flex flex-col">
+                <label className="text-xs font-bold uppercase tracking-wider text-[hsl(215,16%,40%)] mb-1">
+                  Fabricante
+                </label>
+                <select
+                  value={filterFabricante}
+                  onChange={(e) => setFilterFabricante(e.target.value)}
+                  className="px-3 py-2 rounded-lg border-2 border-[hsl(214,32%,85%)] text-base font-semibold bg-white"
+                  style={{ minHeight: 44 }}
+                >
+                  <option value="__all__">Todos</option>
+                  {fabricanteOptions.map((f) => (
+                    <option key={f} value={f}>{f}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="ml-auto text-sm font-semibold text-[hsl(215,16%,40%)]">
+                {pendientes.length} contenedor{pendientes.length === 1 ? "" : "es"} visible{pendientes.length === 1 ? "" : "s"}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-5">
+              {grouped.map(([invoice, items]) => {
+                const color = getInvColor(invoice);
+                const first = items[0];
+                const totalM2 = items.reduce(
+                  (sum, r) => sum + (Number(String(r.qty).replace(/\./g, "").replace(",", ".")) || 0),
+                  0
+                );
+                const isCollapsed = !!collapsed[invoice];
+                const eb = estadoBadgeStyle(first.estado);
+                return (
+                  <div key={invoice} className="flex flex-col gap-3">
+                    <button
+                      type="button"
+                      onClick={() => toggleGroup(invoice)}
+                      className="w-full flex items-center justify-between gap-3 px-5 py-4 rounded-xl text-left flex-wrap"
+                      style={{
+                        background: color.bg,
+                        borderLeft: `4px solid ${color.border}`,
+                      }}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        {isCollapsed ? (
+                          <ChevronRight className="w-5 h-5" style={{ color: color.text }} />
+                        ) : (
+                          <ChevronDown className="w-5 h-5" style={{ color: color.text }} />
+                        )}
+                        <div className="text-lg font-extrabold font-mono" style={{ color: color.text }}>
+                          #{invoice}
+                        </div>
+                        <div className="px-2 py-0.5 rounded-full text-xs font-bold bg-[hsl(210,20%,92%)] text-[hsl(215,16%,30%)]">
+                          🏭 {first.proveedor || "—"}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <div
+                          className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border"
+                          style={{ background: eb.bg, color: eb.fg, borderColor: eb.border }}
+                        >
+                          {first.estado || "—"}
+                        </div>
+                        <div className="text-xs font-semibold text-[hsl(215,16%,35%)]">
+                          📅 {first.eta || "—"}
+                        </div>
+                        <div className="text-xs font-bold" style={{ color: color.text }}>
+                          {items.length} producto{items.length === 1 ? "" : "s"} · {totalM2.toLocaleString("es-CO", { maximumFractionDigits: 2 })} m² total
+                        </div>
+                      </div>
+                    </button>
+
+                    {!isCollapsed && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-3" style={{ borderLeft: `4px solid ${color.border}` }}>
+                        {items.map((r) => (
+                          <ContainerCard
+                            key={`${r.rowNumber}-${r.invoice}`}
+                            row={r}
+                            onSaved={() => setReloadKey((k) => k + 1)}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+              {pendientes.length === 0 && (
+                <div className="text-center py-16 text-[hsl(215,16%,45%)]">
+                  <div className="text-4xl mb-3">📭</div>
+                  <div className="text-lg font-semibold">Sin contenedores pendientes</div>
+                </div>
+              )}
+            </div>
+          </>
         )}
         {!loading && !error && tab === "aprobaciones" && isAdmin && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
