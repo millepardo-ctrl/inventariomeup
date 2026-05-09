@@ -362,7 +362,7 @@ const BodegaView = ({ onBack, isAdmin }: { onBack: () => void; isAdmin: boolean 
           .sort((a, b) => {
             const ep = estadoPrioridad(a.estado) - estadoPrioridad(b.estado);
             if (ep !== 0) return ep;
-            return a.etaNum - b.etaNum;
+            return parseFechaETA(a.eta) - parseFechaETA(b.eta);
           });
         if (!cancelled) {
           setRows(parsed);
@@ -572,7 +572,13 @@ const BodegaView = ({ onBack, isAdmin }: { onBack: () => void; isAdmin: boolean 
                           <ContainerCard
                             key={`${r.rowNumber}-${r.invoice}`}
                             row={r}
-                            onSaved={() => setReloadKey((k) => k + 1)}
+                            onLocalUpdate={(rowNumber, conteo, verificacion) =>
+                              setRows((prev) =>
+                                prev.map((x) =>
+                                  x.rowNumber === rowNumber ? { ...x, conteo, verificacion } : x
+                                )
+                              )
+                            }
                           />
                         ))}
                       </div>
