@@ -1,11 +1,14 @@
+import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import Dashboard from "@/components/inventory/Dashboard";
+import BodegaView from "@/components/bodega/BodegaView";
 import { useGoogleSheetProducts } from "@/hooks/useGoogleSheetProducts";
 import logoMeup from "@/assets/logo-meup.png";
 
 const Index = () => {
   const { user, logout, isAdmin } = useAuth();
   const { products, loading, refreshing, error, lastUpdated, refresh } = useGoogleSheetProducts();
+  const [view, setView] = useState<"inventario" | "bodega">("inventario");
 
   if (loading) {
     return (
@@ -39,6 +42,10 @@ const Index = () => {
     email: user!.email,
   };
 
+  if (view === "bodega" && isAdmin) {
+    return <BodegaView onBack={() => setView("inventario")} isAdmin={isAdmin} />;
+  }
+
   return (
     <Dashboard
       user={appUser}
@@ -47,6 +54,7 @@ const Index = () => {
       lastUpdated={lastUpdated}
       onRefresh={refresh}
       onLogout={logout}
+      onOpenBodega={isAdmin ? () => setView("bodega") : undefined}
     />
   );
 };
