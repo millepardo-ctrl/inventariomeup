@@ -8,9 +8,6 @@ const SHEET_CSV =
 const NAV_CSV =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vRZcZ_HAFNOdIAXh8AvNqeiBM3fjfBLHUPYxz5u_WYPnwi_nKZ8N3lzpAnSLYRb6HNp46DHG0Z48mjZ/pub?gid=2028185077&single=true&output=csv";
 
-// Estados that map to Disp 1 (próximo a llegar)
-const DISP1_ESTADOS = new Set(["EN ADUANA", "EN PUERTO"]);
-
 const toNum = (val: any): number => {
   if (val === null || val === undefined || val === "") return 0;
   const cleaned = String(val)
@@ -19,6 +16,20 @@ const toNum = (val: any): number => {
     .replace(/,(?=\d{3})/g, "")
     .replace(",", ".");
   return parseFloat(cleaned) || 0;
+};
+
+// Parse DD/MM/YYYY -> Date (for ordering ETAs). Falls back to a far-future date.
+const parseEtaDate = (s: string): Date => {
+  if (!s) return new Date(9999, 0, 1);
+  const parts = s.trim().split("/");
+  if (parts.length === 3) {
+    const d = parseInt(parts[0], 10);
+    const m = parseInt(parts[1], 10);
+    const y = parseInt(parts[2], 10);
+    if (!isNaN(d) && !isNaN(m) && !isNaN(y)) return new Date(y, m - 1, d);
+  }
+  const dt = new Date(s);
+  return isNaN(dt.getTime()) ? new Date(9999, 0, 1) : dt;
 };
 
 export function useGoogleSheetProducts() {
@@ -53,38 +64,40 @@ export function useGoogleSheetProducts() {
           console.log("cols[20] alerta:", cols_test[20]);
         }
 
-        // Parse navegación data to build ETA/estado map per product code
+        // Parse navegación data to build ETA/estado map per product code.
+        // Disp 1 = arrival with the earliest ETA, Disp 2 = the next one.
         const navResult = Papa.parse(navCsv, { skipEmptyLines: true });
-        const navRows = (navResult.data as string[][]).slice(2); // skip header rows
+        const navRows = (navResult.data as string[][]).slice(4); // skip 4 header rows
 
-        // Group nav entries by code: { code -> { d1: {eta, estado}, d2: {eta, estado} } }
-        const navMap: Record<
+        const navByCode: Record<
           string,
-          { eta1: string | null; est1: string | null; eta2: string | null; est2: string | null }
+          { eta: string; estado: string; date: Date }[]
         > = {};
 
         for (const cols of navRows) {
           const code = String(cols[1] || "").trim();
           if (!code.match(/^\d/)) continue;
-          const eta = String(cols[6] || "").trim() || null;
-          const estado =
-            String(cols[8] || "")
-              .trim()
-              .toUpperCase() || null;
+          const etaEditable = String(cols[11] || "").trim();
+          const etaText = String(cols[6] || "").trim();
+          const eta = etaEditable || etaText;
+          const estado = String(cols[8] || "").trim().toUpperCase();
           if (!estado) continue;
+          if (!navByCode[code]) navByCode[code] = [];
+          navByCode[code].push({ eta, estado, date: parseEtaDate(etaEditable) });
+        }
 
-          if (!navMap[code]) {
-            navMap[code] = { eta1: null, est1: null, eta2: null, est2: null };
-          }
-
-          const isDisp1 = DISP1_ESTADOS.has(estado);
-          if (isDisp1) {
-            navMap[code].eta1 = eta;
-            navMap[code].est1 = estado;
-          } else {
-            navMap[code].eta2 = eta;
-            navMap[code].est2 = estado;
-          }
+        const navMap: Record<
+          string,
+          { eta1: string | null; est1: string | null; eta2: string | null; est2: string | null }
+        > = {};
+        for (const code of Object.keys(navByCode)) {
+          const sorted = navByCode[code].sort((a, b) => a.date.getTime() - b.date.getTime());
+          navMap[code] = {
+            eta1: sorted[0]?.eta || null,
+            est1: sorted[0]?.estado || null,
+            eta2: sorted[1]?.eta || null,
+            est2: sorted[1]?.estado || null,
+          };
         }
 
         // Parse inventory
