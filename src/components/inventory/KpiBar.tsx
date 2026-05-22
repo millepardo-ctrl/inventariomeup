@@ -26,8 +26,8 @@ const KpiBar = ({ products, isVendedor }: KpiBarProps) => {
   const kpis: { label: string; breakdown: { unit: string; value: number }[]; sub: string; icon: string; color: string; simpleValue?: string }[] = [
     { label: "Disp. Barranquilla", breakdown: buildUnitBreakdown("disp_baq"), sub: "disponibles en bodega", icon: "🟡", color: "text-[hsl(var(--disp-baq-value))]" },
     { label: "Disp. Cúcuta", breakdown: buildUnitBreakdown("disp_cuc"), sub: "disponibles en bodega", icon: "⚪", color: "text-muted-foreground" },
-    { label: "Disp. 1 — Próximo", breakdown: buildUnitBreakdown("d1"), sub: `${withD1} refs · próximo a llegar`, icon: "🟢", color: "text-[hsl(var(--disp1-value))]" },
-    { label: "Disp. 2 — Tránsito", breakdown: buildUnitBreakdown("d2"), sub: `${withD2} refs · navegando`, icon: "🔵", color: "text-transit-value" },
+    { label: "Próximo Cont.", breakdown: buildUnitBreakdown("d1"), sub: `${withD1} refs · próximo a llegar`, icon: "🟢", color: "text-[hsl(var(--disp1-value))]" },
+    { label: "Siguiente Cont 2", breakdown: buildUnitBreakdown("d2"), sub: `${withD2} refs · navegando`, icon: "🔵", color: "text-transit-value" },
     ...(isVendedor ? [
       { label: "Reservas Activas", breakdown: buildUnitBreakdown("res"), sub: "material bloqueado", icon: "🔒", color: "text-reserved-value" },
       { label: "Pre-Reservas Tránsito", breakdown: buildUnitBreakdown("pre_res"), sub: "comprometido sobre contenedor", icon: "🔮", color: "text-[hsl(var(--prereserved-value))]" },
