@@ -149,6 +149,17 @@ const ProductCard = ({ product: p, isVendedor, isDistribuidor }: ProductCardProp
                 <div className="text-[11px] text-muted-foreground mt-0.5">{p.u}</div>
                 {p.eta1 && <div className="text-[10px] text-[hsl(var(--disp1-label))] mt-1">📅 ETA: {p.eta1}</div>}
                 {p.est1 && <div className="mt-1.5"><EstadoBadge estado={p.est1} /></div>}
+                {p.arrivals1 && p.arrivals1.length > 1 && (
+                  <div className="mt-2 pt-2 border-t border-border/60 space-y-1">
+                    <div className="text-[9px] uppercase tracking-widest text-muted-foreground font-semibold">Más contenedores</div>
+                    {p.arrivals1.slice(1).map((a, i) => (
+                      <div key={i} className="flex items-center justify-between text-[11px]">
+                        <span className="text-[hsl(var(--disp1-label))]">📅 {a.eta || "—"}</span>
+                        <span className="font-mono font-bold text-[hsl(var(--disp1-value))]">{fmt(a.qty)} {p.u}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
@@ -160,6 +171,17 @@ const ProductCard = ({ product: p, isVendedor, isDistribuidor }: ProductCardProp
                 <div className="text-[11px] text-muted-foreground mt-0.5">{p.u}</div>
                 {p.eta2 && <div className="text-[10px] text-transit-label mt-1">📅 ETA: {p.eta2}</div>}
                 {p.est2 && <div className="mt-1.5"><EstadoBadge estado={p.est2} /></div>}
+                {p.arrivals2 && p.arrivals2.length > 1 && (
+                  <div className="mt-2 pt-2 border-t border-border/60 space-y-1">
+                    <div className="text-[9px] uppercase tracking-widest text-muted-foreground font-semibold">Más contenedores</div>
+                    {p.arrivals2.slice(1).map((a, i) => (
+                      <div key={i} className="flex items-center justify-between text-[11px]">
+                        <span className="text-transit-label">📅 {a.eta || "—"}</span>
+                        <span className="font-mono font-bold text-transit-value">{fmt(a.qty)} {p.u}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 

@@ -71,7 +71,7 @@ export function useGoogleSheetProducts() {
 
         const navByCode: Record<
           string,
-          { eta: string; estado: string; date: Date }[]
+          { eta: string; estado: string; qty: number; date: Date }[]
         > = {};
 
         for (const cols of navRows) {
@@ -81,22 +81,41 @@ export function useGoogleSheetProducts() {
           const etaText = String(cols[6] || "").trim();
           const eta = etaEditable || etaText;
           const estado = String(cols[8] || "").trim().toUpperCase();
+          const qty = toNum(cols[5]);
           if (!estado) continue;
           if (!navByCode[code]) navByCode[code] = [];
-          navByCode[code].push({ eta, estado, date: parseEtaDate(etaEditable) });
+          navByCode[code].push({ eta, estado, qty, date: parseEtaDate(etaEditable || etaText) });
         }
 
         const navMap: Record<
           string,
-          { eta1: string | null; est1: string | null; eta2: string | null; est2: string | null }
+          {
+            eta1: string | null; est1: string | null;
+            eta2: string | null; est2: string | null;
+            arrivals1: Array<{ eta: string; est: string; qty: number }>;
+            arrivals2: Array<{ eta: string; est: string; qty: number }>;
+          }
         > = {};
         for (const code of Object.keys(navByCode)) {
           const sorted = navByCode[code].sort((a, b) => a.date.getTime() - b.date.getTime());
+          const DISP1_ESTADOS = ["EN ADUANA", "EN PUERTO"];
+          const arrivals1 = sorted
+            .filter((s) => DISP1_ESTADOS.includes(s.estado))
+            .map((s) => ({ eta: s.eta, est: s.estado, qty: s.qty }));
+          const arrivals2 = sorted
+            .filter((s) => !DISP1_ESTADOS.includes(s.estado))
+            .map((s) => ({ eta: s.eta, est: s.estado, qty: s.qty }));
+          // Fallback: if no state matches Disp 1, treat earliest as Disp 1
+          if (arrivals1.length === 0 && arrivals2.length > 0) {
+            arrivals1.push(arrivals2.shift()!);
+          }
           navMap[code] = {
-            eta1: sorted[0]?.eta || null,
-            est1: sorted[0]?.estado || null,
-            eta2: sorted[1]?.eta || null,
-            est2: sorted[1]?.estado || null,
+            eta1: arrivals1[0]?.eta || null,
+            est1: arrivals1[0]?.est || null,
+            eta2: arrivals2[0]?.eta || null,
+            est2: arrivals2[0]?.est || null,
+            arrivals1,
+            arrivals2,
           };
         }
 
@@ -129,6 +148,8 @@ export function useGoogleSheetProducts() {
               eta2: nav?.eta2 ?? null,
               est1: nav?.est1 ?? null,
               est2: nav?.est2 ?? null,
+              arrivals1: nav?.arrivals1 ?? [],
+              arrivals2: nav?.arrivals2 ?? [],
             } as Product;
           })
           .filter((p): p is Product => p !== null && !!p.n && !!p.cat);
