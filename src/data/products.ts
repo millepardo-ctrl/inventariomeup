@@ -14,6 +14,8 @@ export interface Product {
   eta2: string | null;
   est1: string | null;
   est2: string | null;
+  arrivals1: Array<{ eta: string; est: string; qty: number }>;
+  arrivals2: Array<{ eta: string; est: string; qty: number }>;
   res: number;
   pre_res: number;
   consumo: number;
