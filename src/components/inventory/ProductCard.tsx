@@ -144,7 +144,7 @@ const ProductCard = ({ product: p, isVendedor, isDistribuidor }: ProductCardProp
             {/* Disp 1 - Teal */}
             {p.d1 > 0 && (
               <div className="bg-card rounded-[9px] p-3 shadow-sm">
-                <div className="text-[10px] font-bold text-[hsl(var(--disp1-value))] uppercase tracking-widest mb-1.5">🟢 Disp. 1 — Próximo</div>
+                <div className="text-[10px] font-bold text-[hsl(var(--disp1-value))] uppercase tracking-widest mb-1.5">🟢 Próximo Cont.</div>
                 <div className="text-2xl font-black text-[hsl(var(--disp1-value))] font-mono">{fmt(p.d1)}</div>
                 <div className="text-[11px] text-muted-foreground mt-0.5">{p.u}</div>
                 {p.eta1 && <div className="text-[10px] text-[hsl(var(--disp1-label))] mt-1">📅 ETA: {p.eta1}</div>}
@@ -155,7 +155,7 @@ const ProductCard = ({ product: p, isVendedor, isDistribuidor }: ProductCardProp
             {/* Disp 2 */}
             {p.d2 > 0 && (
               <div className="bg-card rounded-[9px] p-3 shadow-sm">
-                <div className="text-[10px] font-bold text-transit-value uppercase tracking-widest mb-1.5">🔵 Disp. 2 — En Tránsito</div>
+                <div className="text-[10px] font-bold text-transit-value uppercase tracking-widest mb-1.5">🔵 Siguiente Cont 2</div>
                 <div className="text-2xl font-black text-transit-value font-mono">{fmt(p.d2)}</div>
                 <div className="text-[11px] text-muted-foreground mt-0.5">{p.u}</div>
                 {p.eta2 && <div className="text-[10px] text-transit-label mt-1">📅 ETA: {p.eta2}</div>}
