@@ -533,6 +533,22 @@ const BodegaView = ({ onBack, isAdmin }: { onBack: () => void; isAdmin: boolean 
                   ))}
                 </select>
               </div>
+              <div className="flex flex-col">
+                <label className="text-xs font-bold uppercase tracking-wider text-[hsl(215,16%,40%)] mb-1">
+                  Estado
+                </label>
+                <select
+                  value={filterEstado}
+                  onChange={(e) => setFilterEstado(e.target.value)}
+                  className="px-3 py-2 rounded-lg border-2 border-[hsl(214,32%,85%)] text-base font-semibold bg-white"
+                  style={{ minHeight: 44 }}
+                >
+                  <option value="__all__">Todos</option>
+                  {estadoOptions.map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+              </div>
               <div className="ml-auto text-sm font-semibold text-[hsl(215,16%,40%)]">
                 {pendientes.length} contenedor{pendientes.length === 1 ? "" : "es"} visible{pendientes.length === 1 ? "" : "s"}
               </div>
