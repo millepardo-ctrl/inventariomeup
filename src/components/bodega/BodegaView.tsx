@@ -330,6 +330,7 @@ const BodegaView = ({ onBack, isAdmin }: { onBack: () => void; isAdmin: boolean 
   const [reloadKey, setReloadKey] = useState(0);
   const [filterInvoice, setFilterInvoice] = useState<string>("__all__");
   const [filterFabricante, setFilterFabricante] = useState<string>("__all__");
+  const [filterEstado, setFilterEstado] = useState<string>("__all__");
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
 
   const toggleGroup = (inv: string) =>
@@ -392,15 +393,20 @@ const BodegaView = ({ onBack, isAdmin }: { onBack: () => void; isAdmin: boolean 
     () => Array.from(new Set(rows.map((r) => r.proveedor).filter(Boolean))),
     [rows]
   );
+  const estadoOptions = useMemo(
+    () => Array.from(new Set(rows.map((r) => r.estado).filter(Boolean))),
+    [rows]
+  );
 
   const pendientes = useMemo(
     () =>
       rows.filter(
         (r) =>
           (filterInvoice === "__all__" || r.invoice === filterInvoice) &&
-          (filterFabricante === "__all__" || r.proveedor === filterFabricante)
+          (filterFabricante === "__all__" || r.proveedor === filterFabricante) &&
+          (filterEstado === "__all__" || r.estado === filterEstado)
       ),
-    [rows, filterInvoice, filterFabricante]
+    [rows, filterInvoice, filterFabricante, filterEstado]
   );
 
   const grouped = useMemo(() => {
@@ -524,6 +530,22 @@ const BodegaView = ({ onBack, isAdmin }: { onBack: () => void; isAdmin: boolean 
                   <option value="__all__">Todos</option>
                   {fabricanteOptions.map((f) => (
                     <option key={f} value={f}>{f}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex flex-col">
+                <label className="text-xs font-bold uppercase tracking-wider text-[hsl(215,16%,40%)] mb-1">
+                  Estado
+                </label>
+                <select
+                  value={filterEstado}
+                  onChange={(e) => setFilterEstado(e.target.value)}
+                  className="px-3 py-2 rounded-lg border-2 border-[hsl(214,32%,85%)] text-base font-semibold bg-white"
+                  style={{ minHeight: 44 }}
+                >
+                  <option value="__all__">Todos</option>
+                  {estadoOptions.map((s) => (
+                    <option key={s} value={s}>{s}</option>
                   ))}
                 </select>
               </div>
