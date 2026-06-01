@@ -330,6 +330,7 @@ const BodegaView = ({ onBack, isAdmin }: { onBack: () => void; isAdmin: boolean 
   const [reloadKey, setReloadKey] = useState(0);
   const [filterInvoice, setFilterInvoice] = useState<string>("__all__");
   const [filterFabricante, setFilterFabricante] = useState<string>("__all__");
+  const [filterEstado, setFilterEstado] = useState<string>("__all__");
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
 
   const toggleGroup = (inv: string) =>
@@ -392,15 +393,20 @@ const BodegaView = ({ onBack, isAdmin }: { onBack: () => void; isAdmin: boolean 
     () => Array.from(new Set(rows.map((r) => r.proveedor).filter(Boolean))),
     [rows]
   );
+  const estadoOptions = useMemo(
+    () => Array.from(new Set(rows.map((r) => r.estado).filter(Boolean))),
+    [rows]
+  );
 
   const pendientes = useMemo(
     () =>
       rows.filter(
         (r) =>
           (filterInvoice === "__all__" || r.invoice === filterInvoice) &&
-          (filterFabricante === "__all__" || r.proveedor === filterFabricante)
+          (filterFabricante === "__all__" || r.proveedor === filterFabricante) &&
+          (filterEstado === "__all__" || r.estado === filterEstado)
       ),
-    [rows, filterInvoice, filterFabricante]
+    [rows, filterInvoice, filterFabricante, filterEstado]
   );
 
   const grouped = useMemo(() => {
