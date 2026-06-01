@@ -145,7 +145,7 @@ const ContainerCard = ({
     setSaving(true);
     setFeedback(null);
     try {
-      await writeCell({ sheetId: NAV_SHEET_ID, cell: `M${row.rowNumber}` }, num);
+      await writeCell({ sheetId: NAV_SHEET_ID, cell: `P${row.rowNumber}` }, num);
       const diferencia = num - invoiceQty;
       const diferenciaPct = invoiceQty > 0 ? Math.abs(diferencia / invoiceQty) * 100 : 0;
       const requiereAprobacion = diferenciaPct > 10;
@@ -268,7 +268,7 @@ const ApprovalCard = ({ row, onAction }: { row: Row; onAction: () => void }) => 
   const reject = async () => {
     setBusy("no");
     try {
-      await writeCell({ sheetId: NAV_SHEET_ID, cell: `M${row.rowNumber}` }, "");
+      await writeCell({ sheetId: NAV_SHEET_ID, cell: `P${row.rowNumber}` }, "");
       toast.success(`Rechazado #${row.invoice}`);
       onAction();
     } catch (e) {
@@ -355,7 +355,7 @@ const BodegaView = ({ onBack, isAdmin }: { onBack: () => void; isAdmin: boolean 
             eta: (cols[6] || "").trim(),
             bodega: (cols[7] || "").trim(),
             estado: (cols[8] || "").trim(),
-            conteo: (cols[12] || "").trim(),
+            conteo: (cols[15] || "").trim(),
             diferencia: (cols[13] || "").trim(),
             verificacion: (cols[14] || "").trim(),
             etaNum: parseFloat((cols[11] || "").replace(",", ".")) || 999999,
@@ -363,7 +363,6 @@ const BodegaView = ({ onBack, isAdmin }: { onBack: () => void; isAdmin: boolean 
           .filter(
             (r) =>
               r.bodega.toUpperCase().includes("BARRANQUILLA") &&
-              r.estado.toUpperCase() !== "RECIBIDO" &&
               r.code.length > 0
           )
           .sort((a, b) => {
