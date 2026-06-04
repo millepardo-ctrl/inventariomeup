@@ -21,7 +21,7 @@ const toNum = (val: any): number => {
 // Parse DD/MM/YYYY -> Date (for ordering ETAs). Falls back to a far-future date.
 const parseEtaDate = (s: string): Date => {
   if (!s) return new Date(9999, 0, 1);
-  const parts = s.trim().split("/");
+  const parts = s.trim().split(/[\/\-]/);
   if (parts.length === 3) {
     const d = parseInt(parts[0], 10);
     const m = parseInt(parts[1], 10);
@@ -77,14 +77,12 @@ export function useGoogleSheetProducts() {
         for (const cols of navRows) {
           const code = String(cols[1] || "").trim();
           if (!code.match(/^\d/)) continue;
-          const etaEditable = String(cols[11] || "").trim();
-          const etaText = String(cols[6] || "").trim();
-          const eta = etaEditable || etaText;
+          const eta = String(cols[6] || "").trim();
           const estado = String(cols[8] || "").trim().toUpperCase();
           const qty = toNum(cols[5]);
           if (!estado) continue;
           if (!navByCode[code]) navByCode[code] = [];
-          navByCode[code].push({ eta, estado, qty, date: parseEtaDate(etaEditable || etaText) });
+          navByCode[code].push({ eta, estado, qty, date: parseEtaDate(eta) });
         }
 
         const navMap: Record<
