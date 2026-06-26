@@ -124,7 +124,11 @@ Deno.serve(async (req) => {
       }),
     });
     const writeData = await writeRes.json();
-    if (!writeRes.ok) throw new Error(`Write failed: ${JSON.stringify(writeData)}`);
+    if (!writeRes.ok) {
+      throw new Error(
+        `Write failed (share the sheet as Editor with: ${sa.client_email}): ${JSON.stringify(writeData)}`,
+      );
+    }
 
     return new Response(JSON.stringify({ success: true, range: targetRange, value }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
