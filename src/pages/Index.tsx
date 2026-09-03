@@ -2,13 +2,16 @@ import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import Dashboard from "@/components/inventory/Dashboard";
 import BodegaView from "@/components/bodega/BodegaView";
+import MuestrasPanel from "@/components/muestras/MuestrasPanel";
 import { useGoogleSheetProducts } from "@/hooks/useGoogleSheetProducts";
 import logoMeup from "@/assets/logo-meup.png";
+
+type View = "inventario" | "bodega" | "muestras";
 
 const Index = () => {
   const { user, logout, isAdmin } = useAuth();
   const { products, loading, refreshing, error, lastUpdated, refresh } = useGoogleSheetProducts();
-  const [view, setView] = useState<"inventario" | "bodega">("inventario");
+  const [view, setView] = useState<View>("inventario");
 
   if (loading) {
     return (
@@ -35,7 +38,6 @@ const Index = () => {
     );
   }
 
-  // Map auth user to the AppUser interface used by Dashboard
   const appUser = {
     type: isAdmin ? "vendedor" as const : "distribuidor" as const,
     name: user!.nombre,
@@ -44,6 +46,10 @@ const Index = () => {
 
   if (view === "bodega" && isAdmin) {
     return <BodegaView onBack={() => setView("inventario")} isAdmin={isAdmin} />;
+  }
+
+  if (view === "muestras" && isAdmin) {
+    return <MuestrasPanel onBack={() => setView("inventario")} asesorPreset={user!.nombre} />;
   }
 
   return (
@@ -55,6 +61,7 @@ const Index = () => {
       onRefresh={refresh}
       onLogout={logout}
       onOpenBodega={isAdmin ? () => setView("bodega") : undefined}
+      onOpenMuestras={isAdmin ? () => setView("muestras") : undefined}
     />
   );
 };

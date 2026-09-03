@@ -9,6 +9,7 @@ interface DashboardHeaderProps {
   lastUpdated?: Date | null;
   onRefresh?: () => void;
   onOpenBodega?: () => void;
+  onOpenMuestras?: () => void;
 }
 
 const extractCompany = (email: string) => {
@@ -17,7 +18,7 @@ const extractCompany = (email: string) => {
   return name.charAt(0).toUpperCase() + name.slice(1);
 };
 
-const DashboardHeader = ({ user, onLogout, refreshing, lastUpdated, onRefresh, onOpenBodega }: DashboardHeaderProps) => {
+const DashboardHeader = ({ user, onLogout, refreshing, lastUpdated, onRefresh, onOpenBodega, onOpenMuestras }: DashboardHeaderProps) => {
   const isVendedor = user.type === "vendedor";
   const timeStr = lastUpdated
     ? lastUpdated.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit", hour12: false })
@@ -54,8 +55,18 @@ const DashboardHeader = ({ user, onLogout, refreshing, lastUpdated, onRefresh, o
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[hsl(143,64%,24%)] border border-[hsl(142,71%,45%,0.25)] rounded-[9px] text-[hsl(142,69%,58%)] text-xs font-semibold no-underline hover:opacity-90 transition-opacity"
           >
-            📊 Abrir Google Sheet
+            📊 Google Sheet
           </a>
+        )}
+
+        {/* Muestras (admin only) */}
+        {isVendedor && onOpenMuestras && (
+          <button
+            onClick={onOpenMuestras}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[hsl(220,70%,18%)] border border-[hsl(220,70%,35%)] rounded-[9px] text-[hsl(220,85%,75%)] text-xs font-semibold hover:opacity-90 transition-opacity uppercase tracking-wider"
+          >
+            📦 Muestras
+          </button>
         )}
 
         {/* Bodega view (admin only) */}
