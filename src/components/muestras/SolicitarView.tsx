@@ -155,6 +155,7 @@ export default function SolicitarView({ asesorPreset }: Props) {
         dest_empresa: dest.emp || null,
         dest_direccion: dest.dir || null,
         dest_ciudad: dest.city || null,
+        dest_depto: dest.depto || null, // ← esta línea faltaba
         tipo_envio: envio,
         estado: "pendiente",
         origen: "panel",
