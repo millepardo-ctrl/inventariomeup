@@ -1,6 +1,5 @@
-import { useState } from "react";
-import { Package, Warehouse, BarChart3, ArrowLeft, Sparkles, Send, Truck } from "lucide-react";
 import { useState, useEffect } from "react";
+import { Package, Warehouse, BarChart3, ArrowLeft, Sparkles, Send, Truck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import meupLogo from "@/assets/logo-meup.png";
 import SolicitarView from "./SolicitarView";
