@@ -483,7 +483,7 @@ function chipSolid(tipo: string) {
   return "bg-pieza-solid text-primary-foreground border-pieza-solid";
 }
 
-const fieldCls = "w-full bg-muted/50 border border-border rounded-[9px] px-3 py-2 text-[13px] outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors placeholder:text-muted-foreground";
+const fieldCls = "w-full bg-card border border-border rounded-[9px] px-3 py-2 text-[13px] outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors placeholder:text-muted-foreground";
 
 function Label({ children }: { children: React.ReactNode }) {
   return <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">{children}</p>;
