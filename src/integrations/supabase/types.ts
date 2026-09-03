@@ -14,7 +14,98 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      solicitudes_items: {
+        Row: {
+          acabado: string | null
+          codigo: string | null
+          created_at: string
+          id: string
+          m2_unitario: number | null
+          referencia: string | null
+          solicitud_id: string
+          tipo_pieza: string | null
+        }
+        Insert: {
+          acabado?: string | null
+          codigo?: string | null
+          created_at?: string
+          id?: string
+          m2_unitario?: number | null
+          referencia?: string | null
+          solicitud_id: string
+          tipo_pieza?: string | null
+        }
+        Update: {
+          acabado?: string | null
+          codigo?: string | null
+          created_at?: string
+          id?: string
+          m2_unitario?: number | null
+          referencia?: string | null
+          solicitud_id?: string
+          tipo_pieza?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "solicitudes_items_solicitud_id_fkey"
+            columns: ["solicitud_id"]
+            isOneToOne: false
+            referencedRelation: "solicitudes_muestras"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      solicitudes_muestras: {
+        Row: {
+          asesor_nombre: string | null
+          created_at: string
+          dest_cedula: string | null
+          dest_celular: string | null
+          dest_ciudad: string | null
+          dest_departamento: string | null
+          dest_direccion: string | null
+          dest_empresa: string | null
+          dest_nombre: string | null
+          estado: string
+          fecha_despacho: string | null
+          id: string
+          origen: string
+          tipo_envio: string
+        }
+        Insert: {
+          asesor_nombre?: string | null
+          created_at?: string
+          dest_cedula?: string | null
+          dest_celular?: string | null
+          dest_ciudad?: string | null
+          dest_departamento?: string | null
+          dest_direccion?: string | null
+          dest_empresa?: string | null
+          dest_nombre?: string | null
+          estado?: string
+          fecha_despacho?: string | null
+          id?: string
+          origen?: string
+          tipo_envio?: string
+        }
+        Update: {
+          asesor_nombre?: string | null
+          created_at?: string
+          dest_cedula?: string | null
+          dest_celular?: string | null
+          dest_ciudad?: string | null
+          dest_departamento?: string | null
+          dest_direccion?: string | null
+          dest_empresa?: string | null
+          dest_nombre?: string | null
+          estado?: string
+          fecha_despacho?: string | null
+          id?: string
+          origen?: string
+          tipo_envio?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
