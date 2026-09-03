@@ -8,6 +8,25 @@ const SHEET_CSV =
 const NAV_CSV =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vRZcZ_HAFNOdIAXh8AvNqeiBM3fjfBLHUPYxz5u_WYPnwi_nKZ8N3lzpAnSLYRb6HNp46DHG0Z48mjZ/pub?gid=2028185077&single=true&output=csv";
 
+const FETCH_TIMEOUT_MS = 15_000;
+
+async function fetchCsv(url: string, retries = 1): Promise<string> {
+  for (let attempt = 0; attempt <= retries; attempt += 1) {
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+    try {
+      const response = await fetch(url, { cache: "no-store", signal: controller.signal });
+      if (!response.ok) throw new Error(`CSV request failed: ${response.status}`);
+      return await response.text();
+    } catch (error) {
+      if (attempt === retries) throw error;
+    } finally {
+      window.clearTimeout(timeout);
+    }
+  }
+  throw new Error("No se pudo descargar el CSV");
+}
+
 const toNum = (val: any): number => {
   if (val === null || val === undefined || val === "") return 0;
   const cleaned = String(val)
@@ -39,14 +58,17 @@ export function useGoogleSheetProducts() {
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
-  const fetchData = useCallback((isManual = false) => {
+  const fetchData = useCallback(async (isManual = false) => {
     if (isManual) setRefreshing(true);
-
-    Promise.all([fetch(SHEET_CSV).then((r) => r.text()), fetch(NAV_CSV).then((r) => r.text())])
-      .then(([inventoryCsv, navCsv]) => {
-
-
-
+    try {
+      const [inventoryCsv, navFetchResult] = await Promise.all([
+        fetchCsv(SHEET_CSV),
+        fetchCsv(NAV_CSV).then(
+          (csv) => ({ csv }),
+          () => ({ csv: "" }),
+        ),
+      ]);
+      const navCsv = navFetchResult.csv;
         // Parse navegación data to build ETA/estado map per product code.
         // Disp 1 = arrival with the earliest ETA, Disp 2 = the next one.
         const navResult = Papa.parse(navCsv, { skipEmptyLines: true });
@@ -88,7 +110,8 @@ export function useGoogleSheetProducts() {
             .map((s) => ({ eta: s.eta, est: s.estado, qty: s.qty }));
           // Fallback: if no state matches Disp 1, treat earliest as Disp 1
           if (arrivals1.length === 0 && arrivals2.length > 0) {
-            arrivals1.push(arrivals2.shift()!);
+            const earliestArrival = arrivals2.shift();
+            if (earliestArrival) arrivals1.push(earliestArrival);
           }
           navMap[code] = {
             eta1: arrivals1[0]?.eta || null,
@@ -139,12 +162,11 @@ export function useGoogleSheetProducts() {
         setLoading(false);
         setRefreshing(false);
         setError(null);
-      })
-      .catch(() => {
-        setError("No se pudo cargar el inventario");
-        setLoading(false);
-        setRefreshing(false);
-      });
+    } catch {
+      setError("No se pudo cargar el inventario");
+      setLoading(false);
+      setRefreshing(false);
+    }
   }, []);
 
   useEffect(() => {
