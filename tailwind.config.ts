@@ -81,7 +81,26 @@ export default {
           value: "hsl(var(--reserved-value))",
           label: "hsl(var(--reserved-label))",
         },
+        muestra: {
+          bg: "hsl(var(--muestra-bg))",
+          border: "hsl(var(--muestra-border))",
+          value: "hsl(var(--muestra-value))",
+          solid: "hsl(var(--muestra-solid))",
+        },
+        ficha: {
+          bg: "hsl(var(--ficha-bg))",
+          border: "hsl(var(--ficha-border))",
+          value: "hsl(var(--ficha-value))",
+          solid: "hsl(var(--ficha-solid))",
+        },
+        pieza: {
+          bg: "hsl(var(--pieza-bg))",
+          border: "hsl(var(--pieza-border))",
+          value: "hsl(var(--pieza-value))",
+          solid: "hsl(var(--pieza-solid))",
+        },
       },
+
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
