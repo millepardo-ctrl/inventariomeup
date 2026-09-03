@@ -61,14 +61,14 @@ export function useGoogleSheetProducts() {
   const fetchData = useCallback(async (isManual = false) => {
     if (isManual) setRefreshing(true);
     try {
-      const [inventoryCsv, navResult] = await Promise.all([
+      const [inventoryCsv, navFetchResult] = await Promise.all([
         fetchCsv(SHEET_CSV),
         fetchCsv(NAV_CSV).then(
           (csv) => ({ csv }),
           () => ({ csv: "" }),
         ),
       ]);
-      const navCsv = navResult.csv;
+      const navCsv = navFetchResult.csv;
         // Parse navegación data to build ETA/estado map per product code.
         // Disp 1 = arrival with the earliest ETA, Disp 2 = the next one.
         const navResult = Papa.parse(navCsv, { skipEmptyLines: true });
