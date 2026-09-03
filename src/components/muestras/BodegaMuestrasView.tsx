@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Copy, FileDown } from "lucide-react";
+import meupLogo from "@/assets/logo-meup.png";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -79,7 +80,7 @@ function descargarGuia(s: Solicitud) {
     year: "numeric",
   });
   const urgente = s.tipo_envio === "urgente";
-  const logoUrl = `${window.location.origin}/logo-meup.png`;
+  const logoUrl = meupLogo;
 
   const itemsHtml = s.items
     .map((it) => {
