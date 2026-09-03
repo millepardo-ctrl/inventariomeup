@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { Copy } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -28,6 +29,28 @@ interface Solicitud {
   solicitudes_items: Item[];
 }
 
+function generarMensaje(s: Solicitud): string {
+  return [
+    `*SOLICITUD MUESTRAS MeUp*`,
+    `Asesor: ${s.asesor_nombre || "—"}`,
+    ``,
+    `👤 ${s.dest_nombre || "—"}`,
+    s.dest_cedula ? `🪪 Cédula ${s.dest_cedula}` : null,
+    s.dest_celular ? `📱 ${s.dest_celular}` : null,
+    s.dest_empresa ? `🏢 ${s.dest_empresa}` : null,
+    s.dest_direccion ? `📍 ${s.dest_direccion}` : null,
+    s.dest_ciudad ? `🏙 ${s.dest_ciudad}` : null,
+    `🚚 ${s.tipo_envio === "urgente" ? "🚨 URGENTE" : "Estándar"}`,
+    ``,
+    ...s.solicitudes_items.map((it) => {
+      const t = it.tipo_pieza === "muestra" ? "muestra 10×15" : it.tipo_pieza === "ficha" ? "ficha grande" : "pieza";
+      return `• ${it.referencia}${it.acabado ? ` — ${it.acabado}` : ""} (${t})`;
+    }),
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
 export default function BodegaMuestrasView() {
   const { toast } = useToast();
   const [filtro, setFiltro] = useState<Filtro>("pendiente");
@@ -40,7 +63,6 @@ export default function BodegaMuestrasView() {
       .from("solicitudes_muestras")
       .select("*, solicitudes_items(*)")
       .order("created_at", { ascending: true });
-
     if (!error && data) setLista(data as Solicitud[]);
     setLoading(false);
   }, []);
@@ -50,7 +72,6 @@ export default function BodegaMuestrasView() {
   }, [cargar]);
 
   const hoy = new Date().toDateString();
-
   const filtrada = lista
     .filter((s) => {
       if (filtro === "pendiente") return s.estado === "pendiente";
@@ -73,6 +94,12 @@ export default function BodegaMuestrasView() {
       toast({ title: "✓ Despachado", description: "Solicitud marcada como despachada." });
       cargar();
     }
+  }
+
+  function copiarTelegram(s: Solicitud) {
+    navigator.clipboard
+      .writeText(generarMensaje(s))
+      .then(() => toast({ title: "Copiado", description: "Mensaje listo para WhatsApp o Telegram." }));
   }
 
   return (
@@ -112,7 +139,7 @@ export default function BodegaMuestrasView() {
       ) : (
         <div className="flex flex-col gap-3">
           {filtrada.map((s) => (
-            <SolicitudCard key={s.id} s={s} onDespachar={despachar} />
+            <SolicitudCard key={s.id} s={s} onDespachar={despachar} onCopiar={copiarTelegram} />
           ))}
         </div>
       )}
@@ -120,7 +147,15 @@ export default function BodegaMuestrasView() {
   );
 }
 
-function SolicitudCard({ s, onDespachar }: { s: Solicitud; onDespachar: (id: string) => void }) {
+function SolicitudCard({
+  s,
+  onDespachar,
+  onCopiar,
+}: {
+  s: Solicitud;
+  onDespachar: (id: string) => void;
+  onCopiar: (s: Solicitud) => void;
+}) {
   const urgente = s.tipo_envio === "urgente";
   const hecho = s.estado === "despachado";
   const hora = new Date(s.created_at).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" });
@@ -192,16 +227,24 @@ function SolicitudCard({ s, onDespachar }: { s: Solicitud; onDespachar: (id: str
         })}
       </div>
 
-      <button
-        onClick={() => onDespachar(s.id)}
-        disabled={hecho}
-        className="self-start mt-1 px-4 py-1.5 rounded-[9px] text-primary-foreground text-xs font-bold disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed hover:brightness-110 transition-all shadow-sm"
-        style={hecho ? undefined : { background: "var(--gradient-primary)" }}
-      >
-        {hecho
-          ? `✓ Despachado ${s.fecha_despacho ? new Date(s.fecha_despacho).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" }) : ""}`
-          : "Marcar como despachado"}
-      </button>
+      <div className="flex gap-2 mt-1">
+        <button
+          onClick={() => onCopiar(s)}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-[9px] text-xs font-semibold border border-border bg-card text-muted-foreground hover:border-primary hover:text-primary transition-all"
+        >
+          <Copy className="w-3 h-3" /> Copiar mensaje
+        </button>
+        <button
+          onClick={() => onDespachar(s.id)}
+          disabled={hecho}
+          className="flex-1 py-1.5 rounded-[9px] text-primary-foreground text-xs font-bold disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed hover:brightness-110 transition-all shadow-sm"
+          style={hecho ? undefined : { background: "var(--gradient-primary)" }}
+        >
+          {hecho
+            ? `✓ Despachado ${s.fecha_despacho ? new Date(s.fecha_despacho).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" }) : ""}`
+            : "Marcar como despachado"}
+        </button>
+      </div>
     </div>
   );
 }
