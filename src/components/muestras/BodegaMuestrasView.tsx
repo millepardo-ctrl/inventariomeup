@@ -38,7 +38,7 @@ const REMITENTE = {
   nombre: "Paris Ingenieros SAS - MeUp",
   nit: "900.570.024-6",
   direccion: "Carrera 37 Calle 124 #400 Bodega 3",
-  ciudad: "Medellín, Antioquia",
+  ciudad: "Barranquilla, Atlántico",
   telefono: "302 2381918",
 };
 
