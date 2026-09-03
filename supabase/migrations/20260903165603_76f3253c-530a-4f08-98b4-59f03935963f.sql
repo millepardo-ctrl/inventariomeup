@@ -1,0 +1,1 @@
+ALTER TABLE public.solicitudes_items ADD COLUMN IF NOT EXISTS cantidad integer NOT NULL DEFAULT 1;

@@ -17,6 +17,7 @@ export type Database = {
       solicitudes_items: {
         Row: {
           acabado: string | null
+          cantidad: number
           codigo: string | null
           created_at: string
           id: string
@@ -27,6 +28,7 @@ export type Database = {
         }
         Insert: {
           acabado?: string | null
+          cantidad?: number
           codigo?: string | null
           created_at?: string
           id?: string
@@ -37,6 +39,7 @@ export type Database = {
         }
         Update: {
           acabado?: string | null
+          cantidad?: number
           codigo?: string | null
           created_at?: string
           id?: string
