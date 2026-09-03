@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Package, Warehouse, BarChart3, ArrowLeft, Sparkles, Send, Truck } from "lucide-react";
-import { lsGet } from "@/data/muestras-catalog";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import meupLogo from "@/assets/logo-meup.png";
 import SolicitarView from "./SolicitarView";
 import BodegaMuestrasView from "./BodegaMuestrasView";
@@ -16,15 +17,30 @@ interface Props {
 const MuestrasPanel = ({ onBack, asesorPreset }: Props) => {
   const [tab, setTab] = useState<PanelTab>("solicitar");
 
-  const all = lsGet();
   const hoy = new Date();
-  const pendientes = all.filter(s => s.estado === "pendiente").length;
-  const delMes = all.filter(s => {
-    const d = new Date(s.fechaSolicitud);
-    return d.getMonth() === hoy.getMonth() && d.getFullYear() === hoy.getFullYear();
-  });
-  const despachadasMes = delMes.filter(s => s.estado === "despachado").length;
-  const refsMes = delMes.reduce((acc, s) => acc + s.items.length, 0);
+  const [pendientes, setPendientes] = useState(0);
+  const [despachadasMes, setDespachadasMes] = useState(0);
+  const [refsMes, setRefsMes] = useState(0);
+
+  useEffect(() => {
+    (async () => {
+      const { data: sols } = await supabase.from("solicitudes_muestras").select("id, estado, fecha_solicitud");
+      if (!sols) return;
+      const esMes = (f: string) => {
+        const d = new Date(f);
+        return d.getMonth() === hoy.getMonth() && d.getFullYear() === hoy.getFullYear();
+      };
+      const pend = sols.filter((s) => s.estado === "pendiente").length;
+      const delMesIds = sols.filter((s) => esMes(s.fecha_solicitud)).map((s) => s.id);
+      const desp = sols.filter((s) => s.estado === "despachado" && esMes(s.fecha_solicitud)).length;
+      setPendientes(pend);
+      setDespachadasMes(desp);
+      if (delMesIds.length > 0) {
+        const { data: its } = await supabase.from("solicitudes_items").select("id").in("solicitud_id", delMesIds);
+        setRefsMes(its?.length ?? 0);
+      }
+    })();
+  }, []);
 
   const nombre = (asesorPreset || "").split(" ")[0];
   const saludo = hoy.getHours() < 12 ? "Buenos días" : hoy.getHours() < 19 ? "Buenas tardes" : "Buenas noches";
@@ -46,9 +62,28 @@ const MuestrasPanel = ({ onBack, asesorPreset }: Props) => {
 
           {/* Tabs */}
           <nav className="flex gap-1">
-            <TabBtn id="solicitar" current={tab} onClick={setTab} icon={<Package className="w-3.5 h-3.5" />} label="Solicitar" />
-            <TabBtn id="bodega"    current={tab} onClick={setTab} icon={<Warehouse className="w-3.5 h-3.5" />} label="Bodega" badge={pendientes} />
-            <TabBtn id="reportes" current={tab} onClick={setTab} icon={<BarChart3 className="w-3.5 h-3.5" />} label="Reportes" />
+            <TabBtn
+              id="solicitar"
+              current={tab}
+              onClick={setTab}
+              icon={<Package className="w-3.5 h-3.5" />}
+              label="Solicitar"
+            />
+            <TabBtn
+              id="bodega"
+              current={tab}
+              onClick={setTab}
+              icon={<Warehouse className="w-3.5 h-3.5" />}
+              label="Bodega"
+              badge={pendientes}
+            />
+            <TabBtn
+              id="reportes"
+              current={tab}
+              onClick={setTab}
+              icon={<BarChart3 className="w-3.5 h-3.5" />}
+              label="Reportes"
+            />
           </nav>
 
           <div className="h-7 w-px bg-secondary" />
@@ -72,11 +107,10 @@ const MuestrasPanel = ({ onBack, asesorPreset }: Props) => {
             </span>
             <div>
               <div className="text-[15px] font-bold text-foreground leading-tight">
-                {saludo}{nombre ? `, ${nombre}` : ""} 👋
+                {saludo}
+                {nombre ? `, ${nombre}` : ""} 👋
               </div>
-              <div className="text-[11px] text-muted-foreground">
-                Arma tu kit de muestras en segundos
-              </div>
+              <div className="text-[11px] text-muted-foreground">Arma tu kit de muestras en segundos</div>
             </div>
           </div>
 
@@ -84,7 +118,12 @@ const MuestrasPanel = ({ onBack, asesorPreset }: Props) => {
 
           <div className="flex gap-2 flex-wrap">
             <MiniKpi icon={<Send className="w-3.5 h-3.5" />} label="Pendientes" value={pendientes} tone="muestra" />
-            <MiniKpi icon={<Truck className="w-3.5 h-3.5" />} label="Despachadas mes" value={despachadasMes} tone="ficha" />
+            <MiniKpi
+              icon={<Truck className="w-3.5 h-3.5" />}
+              label="Despachadas mes"
+              value={despachadasMes}
+              tone="ficha"
+            />
             <MiniKpi icon={<Package className="w-3.5 h-3.5" />} label="Refs. del mes" value={refsMes} tone="pieza" />
           </div>
         </div>
@@ -93,8 +132,8 @@ const MuestrasPanel = ({ onBack, asesorPreset }: Props) => {
       {/* Content */}
       <div className="flex-1">
         {tab === "solicitar" && <SolicitarView asesorPreset={asesorPreset} />}
-        {tab === "bodega"    && <BodegaMuestrasView />}
-        {tab === "reportes"  && <ReportesView />}
+        {tab === "bodega" && <BodegaMuestrasView />}
+        {tab === "reportes" && <ReportesView />}
       </div>
     </div>
   );
