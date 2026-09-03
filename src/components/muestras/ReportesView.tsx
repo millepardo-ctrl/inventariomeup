@@ -137,7 +137,7 @@ export default function ReportesView() {
 
 function StatCard({ label, value, sub, highlight }: { label: string; value: number; sub: string; highlight?: boolean }) {
   return (
-    <div className="bg-card border border-border/60 rounded-xl px-4 py-3 shadow-sm">
+    <div className={`rounded-xl px-4 py-3 shadow-sm border transition-all hover:-translate-y-px hover:shadow-[var(--shadow-lift)] ${highlight ? "bg-muestra-bg border-muestra-border" : "bg-card border-border/60"}`}>
       <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">{label}</div>
       <div className={`text-2xl font-black font-mono ${highlight ? "text-primary" : "text-foreground"}`}>{value}</div>
       <div className="text-[11px] text-muted-foreground mt-0.5">{sub}</div>
