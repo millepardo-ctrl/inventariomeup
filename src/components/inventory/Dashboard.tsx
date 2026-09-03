@@ -13,9 +13,10 @@ interface DashboardProps {
   lastUpdated?: Date | null;
   onRefresh?: () => void;
   onOpenBodega?: () => void;
+  onOpenMuestras?: () => void;
 }
 
-const Dashboard = ({ user, products, onLogout, refreshing, lastUpdated, onRefresh, onOpenBodega }: DashboardProps) => {
+const Dashboard = ({ user, products, onLogout, refreshing, lastUpdated, onRefresh, onOpenBodega, onOpenMuestras }: DashboardProps) => {
   const [search, setSearch] = useState("");
   const [cat, setCat] = useState<"Todos" | Category>("Todos");
   const [filterStock, setFilterStock] = useState(false);
