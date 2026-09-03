@@ -112,6 +112,29 @@
     --prereserved-value: 273 72% 47%;
     --prereserved-label: 271 81% 56%;
 
+    /* Muestras module — tipo de muestra */
+    --muestra-bg: 214 95% 94%;
+    --muestra-border: 213 90% 82%;
+    --muestra-value: 224 76% 42%;
+    --muestra-solid: 217 91% 60%;
+
+    --ficha-bg: 152 76% 92%;
+    --ficha-border: 156 66% 76%;
+    --ficha-value: 163 72% 26%;
+    --ficha-solid: 160 84% 39%;
+
+    --pieza-bg: 270 100% 96%;
+    --pieza-border: 270 85% 85%;
+    --pieza-value: 273 72% 40%;
+    --pieza-solid: 271 81% 56%;
+
+    /* Muestras gradients */
+    --gradient-muestras: linear-gradient(135deg, hsl(217 91% 96%), hsl(270 100% 97%) 45%, hsl(152 76% 96%));
+    --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%), hsl(224 76% 48%));
+    --shadow-lift: 0 6px 20px -8px hsl(222 47% 11% / 0.18);
+
+
+
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;

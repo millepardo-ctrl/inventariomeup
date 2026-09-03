@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from "react";
-import { Search, X } from "lucide-react";
+import { Search, ShoppingBag, Info, ChevronDown, Trash2, Copy, ArrowRight } from "lucide-react";
 import {
   CAT, CATS_MUESTRAS, CAT_TOKEN, KITS, ASESORES_MUESTRAS, CIUDADES,
   CarritoItem, MuestrasFamilia, TipoMuestra, SolicitudItem,
@@ -10,6 +10,15 @@ import { useToast } from "@/hooks/use-toast";
 interface Props { asesorPreset?: string; }
 
 const EMPTY_DEST = { nom:"", ced:"", cel:"", emp:"", dir:"", city:"", depto:"" };
+
+const KIT_META: { k: string; label: string; emoji: string }[] = [
+  { k: "marmol",     label: "Kit Mármol",     emoji: "🏛" },
+  { k: "travertino", label: "Kit Travertino", emoji: "🌾" },
+  { k: "arquitecto", label: "Kit Arquitecto", emoji: "📐" },
+  { k: "piscinas",   label: "Kit Piscinas",   emoji: "🏊" },
+  { k: "fachada",    label: "Kit Fachada",    emoji: "🧱" },
+  { k: "mayorista",  label: "Kit Mayorista",  emoji: "📦" },
+];
 
 export default function SolicitarView({ asesorPreset }: Props) {
   const { toast } = useToast();
@@ -22,6 +31,7 @@ export default function SolicitarView({ asesorPreset }: Props) {
   const [cityInput, setCityInput] = useState("");
   const [cityDrop, setCityDrop]   = useState<{c:string;d:string}[]>([]);
   const [dropOpen, setDropOpen]   = useState(false);
+  const [helpOpen, setHelpOpen]   = useState(false);
   const cityRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -119,7 +129,7 @@ export default function SolicitarView({ asesorPreset }: Props) {
     setCarrito([]);
     setDest({ ...EMPTY_DEST });
     setCityInput("");
-    toast({ title: "Solicitud creada", description: `${items.length} referencias enviadas a bodega.` });
+    toast({ title: "🎉 Solicitud creada", description: `${items.length} referencias enviadas a bodega.` });
   }
 
   function copyTelegram() {
@@ -147,8 +157,14 @@ export default function SolicitarView({ asesorPreset }: Props) {
 
   const canCreate = carrito.length > 0 && !!asesor && !!dest.nom;
 
+  const resumen = useMemo(() => ({
+    muestras: carrito.filter(c => c.tipo === "muestra").length,
+    fichas:   carrito.filter(c => c.tipo === "ficha").length,
+    piezas:   carrito.filter(c => c.tipo === "pieza").length,
+  }), [carrito]);
+
   return (
-    <div className="max-w-[1400px] mx-auto flex gap-0 h-[calc(100vh-58px)]">
+    <div className="max-w-[1400px] mx-auto flex gap-0 h-[calc(100vh-125px)]">
       {/* LEFT: form + catalog */}
       <div className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-5 border-r border-border">
         {/* Asesor + envío */}
@@ -225,21 +241,24 @@ export default function SolicitarView({ asesorPreset }: Props) {
 
         {/* Kits */}
         <section>
-          <Label>Kits rápidos</Label>
-          <div className="flex flex-wrap gap-2">
-            {[
-              ["marmol","Kit Mármol"],["travertino","Kit Travertino"],["arquitecto","Kit Arquitecto"],
-              ["piscinas","Kit Piscinas"],["fachada","Kit Fachada"],["mayorista","Kit Mayorista"],
-            ].map(([k, label]) => (
+          <div className="flex items-center gap-2 mb-2">
+            <Label>Kits rápidos</Label>
+            <button onClick={() => applyKit("clear")}
+              className="ml-auto -mt-2 flex items-center gap-1.5 px-2.5 py-1 rounded-[9px] text-[11px] font-semibold border border-dashed border-border bg-card text-muted-foreground hover:border-destructive hover:text-destructive hover:bg-destructive/5 transition-all">
+              <Trash2 className="w-3 h-3" /> Limpiar
+            </button>
+          </div>
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+            {KIT_META.map(({ k, label, emoji }) => (
               <button key={k} onClick={() => applyKit(k)}
-                className="px-3 py-1.5 rounded-[9px] text-xs font-semibold border border-border bg-card text-muted-foreground hover:border-primary hover:text-primary hover:bg-accent transition-all">
-                {label}
+                className="group flex flex-col items-start gap-0.5 px-2.5 py-2 rounded-[11px] border border-border bg-card text-left hover:border-primary hover:shadow-[var(--shadow-lift)] hover:-translate-y-0.5 transition-all">
+                <span className="text-lg leading-none">{emoji}</span>
+                <span className="text-[11.5px] font-bold text-foreground leading-tight group-hover:text-primary transition-colors">
+                  {label.replace("Kit ", "")}
+                </span>
+                <span className="text-[10px] text-muted-foreground font-mono">{(KITS[k] ?? []).length} refs</span>
               </button>
             ))}
-            <button onClick={() => applyKit("clear")}
-              className="px-3 py-1.5 rounded-[9px] text-xs font-semibold border border-dashed border-border bg-card text-muted-foreground hover:border-destructive hover:text-destructive hover:bg-destructive/5 transition-all">
-              Limpiar todo
-            </button>
           </div>
         </section>
 
@@ -267,27 +286,40 @@ export default function SolicitarView({ asesorPreset }: Props) {
               const active = cat === c;
               return (
                 <button key={c} onClick={() => setCat(c)}
-                  className="px-2.5 py-1 rounded-[9px] text-[11px] font-bold border transition-all uppercase tracking-wider"
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold border transition-all uppercase tracking-wider ${
+                    active ? "shadow-sm" : "hover:-translate-y-px"
+                  }`}
                   style={{
                     borderColor: active ? `hsl(var(--cat-${tk}))` : "hsl(var(--border))",
                     backgroundColor: active ? `hsl(var(--cat-${tk}-bg))` : "hsl(var(--card))",
                     color: active ? `hsl(var(--cat-${tk}-label))` : "hsl(var(--muted-foreground))",
                   }}>
+                  <span className="w-2 h-2 rounded-full" style={{ background: `hsl(var(--cat-${tk}))` }} />
                   {c}
                 </button>
               );
             })}
           </div>
 
-          {/* Note */}
-          <p className="text-[11px] text-muted-foreground mb-2 leading-relaxed">
-            <strong className="text-foreground/70">Losas:</strong> 1er clic = muestra 10×15 · 2° = ficha · 3° = quitar ·{" "}
-            <strong className="text-foreground/70">Bordes:</strong> 1er = muestra · 2° = pieza completa ·{" "}
-            <strong className="text-foreground/70">Piezas:</strong> clic para seleccionar
-          </p>
+          {/* Help card */}
+          <div className="mb-3 rounded-[11px] border border-border bg-card overflow-hidden">
+            <button onClick={() => setHelpOpen(o => !o)}
+              className="w-full flex items-center gap-2 px-3 py-2 text-[11.5px] font-bold text-muted-foreground hover:text-foreground transition-colors">
+              <Info className="w-3.5 h-3.5 text-primary" />
+              ¿Cómo seleccionar?
+              <ChevronDown className={`w-3.5 h-3.5 ml-auto transition-transform ${helpOpen ? "rotate-180" : ""}`} />
+            </button>
+            {helpOpen && (
+              <div className="px-3 pb-3 flex flex-col gap-1.5 text-[11.5px] text-muted-foreground">
+                <p><strong className="text-foreground/80">Losas:</strong> 1er clic = muestra 10×15 · 2° = ficha · 3° = quitar</p>
+                <p><strong className="text-foreground/80">Bordes:</strong> 1er = muestra · 2° = pieza completa</p>
+                <p><strong className="text-foreground/80">Piezas:</strong> clic para seleccionar</p>
+              </div>
+            )}
+          </div>
 
           {/* Family rows */}
-          <div className="flex flex-col gap-0.5">
+          <div className="flex flex-col gap-1.5">
             {visible.map(fam => (
               <FamilyRow key={fam.id} fam={fam} carrito={carrito} toggle={toggle} showCat={!!srch} />
             ))}
@@ -300,40 +332,56 @@ export default function SolicitarView({ asesorPreset }: Props) {
 
       {/* RIGHT: cart */}
       <aside className="w-[310px] flex-shrink-0 overflow-y-auto px-4 py-4 flex flex-col gap-3 bg-background">
-        <div className="bg-card rounded-xl border border-border flex flex-col flex-1">
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Solicitud</span>
+        <div className="bg-card rounded-xl border border-border flex flex-col flex-1 shadow-sm overflow-hidden">
+          <div className="px-4 py-3 border-b border-border" style={{ background: "var(--gradient-muestras)" }}>
+            <div className="flex items-center gap-2">
+              <ShoppingBag className="w-4 h-4 text-primary" />
+              <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Solicitud</span>
+              <span className="ml-auto text-xl font-black font-mono text-primary leading-none">{carrito.length}</span>
+            </div>
             {carrito.length > 0 && (
-              <span className="ml-auto bg-primary/15 text-primary text-[11px] font-bold px-2 py-px rounded-full">{carrito.length}</span>
+              <div className="flex gap-1.5 mt-2 flex-wrap">
+                {resumen.muestras > 0 && <MiniTag tipo="muestra">{resumen.muestras} muestras</MiniTag>}
+                {resumen.fichas > 0   && <MiniTag tipo="ficha">{resumen.fichas} fichas</MiniTag>}
+                {resumen.piezas > 0   && <MiniTag tipo="pieza">{resumen.piezas} piezas</MiniTag>}
+              </div>
             )}
           </div>
-          <div className="flex-1 overflow-y-auto px-3 py-2 max-h-[calc(100vh-260px)]">
+          <div className="flex-1 overflow-y-auto px-3 py-2 max-h-[calc(100vh-330px)]">
             {carrito.length === 0 ? (
-              <p className="text-center py-10 text-muted-foreground text-xs leading-relaxed">
-                Selecciona productos<br />del catálogo o elige un kit
-              </p>
+              <div className="text-center py-10 flex flex-col items-center gap-2">
+                <span className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+                  <ShoppingBag className="w-5 h-5 text-muted-foreground" />
+                </span>
+                <p className="text-muted-foreground text-xs leading-relaxed">
+                  Todavía no hay muestras.<br />Elige un kit rápido o toca<br />una referencia del catálogo.
+                </p>
+              </div>
             ) : (
               carrito.map((item, i) => {
                 const fam = CAT.find(f => f.id === item.familiaId);
                 const ref = fam?.refs[item.refIdx];
                 if (!fam || !ref) return null;
                 const isBorde = fam.tp === "borde";
+                const tk = CAT_TOKEN[fam.cat] ?? "marmol";
                 const badgeLabel = item.tipo === "pieza"
                   ? ref.l
                   : item.tipo === "muestra" ? "10×15"
                   : isBorde ? ref.l : "Ficha";
                 return (
-                  <div key={i} className="flex items-start gap-2 py-2.5 border-b border-border/60 last:border-none">
+                  <div key={i}
+                    className="flex items-start gap-2 py-2.5 pl-2.5 mb-1 rounded-[9px] hover:bg-accent/50 transition-colors"
+                    style={{ borderLeftWidth: 3, borderLeftStyle: "solid", borderLeftColor: `hsl(var(--cat-${tk}))` }}>
                     <div className="flex-1 min-w-0">
                       <div className="text-[13px] font-semibold text-foreground leading-tight">{fam.fam}</div>
                       <div className="text-[11px] text-muted-foreground font-mono mt-0.5">{ref.l} · {ref.cod}</div>
                     </div>
                     {item.tipo === "pieza" ? (
-                      <span className={`text-[11px] font-bold px-2 py-0.5 rounded-[6px] flex-shrink-0 ${chipCls("pieza")}`}>{badgeLabel}</span>
+                      <span className={`text-[11px] font-bold px-2 py-0.5 rounded-[6px] border flex-shrink-0 ${chipCls("pieza")}`}>{badgeLabel}</span>
                     ) : (
                       <button
                         onClick={() => toggleCartTipo(i)}
-                        className={`text-[11px] font-bold px-2 py-0.5 rounded-[6px] flex-shrink-0 cursor-pointer transition-all ${chipCls(item.tipo)}`}
+                        className={`text-[11px] font-bold px-2 py-0.5 rounded-[6px] border flex-shrink-0 cursor-pointer transition-all hover:scale-105 ${chipCls(item.tipo)}`}
                       >{badgeLabel}</button>
                     )}
                     <button onClick={() => removeFromCart(i)} className="text-muted-foreground hover:text-destructive transition-colors text-base leading-none flex-shrink-0 mt-0.5">×</button>
@@ -345,12 +393,13 @@ export default function SolicitarView({ asesorPreset }: Props) {
         </div>
 
         <button onClick={copyTelegram} disabled={carrito.length === 0}
-          className="w-full py-2 rounded-[10px] border border-border bg-card text-muted-foreground text-sm font-semibold disabled:opacity-30 hover:border-primary hover:text-primary transition-all">
-          Copiar Telegram
+          className="w-full py-2 rounded-[10px] border border-border bg-card text-muted-foreground text-sm font-semibold disabled:opacity-30 hover:border-primary hover:text-primary transition-all flex items-center justify-center gap-1.5">
+          <Copy className="w-3.5 h-3.5" /> Copiar Telegram
         </button>
         <button onClick={crearSolicitud} disabled={!canCreate}
-          className="w-full py-2.5 rounded-[10px] bg-primary text-primary-foreground text-sm font-bold disabled:opacity-30 hover:opacity-90 transition-opacity shadow-sm">
-          Crear solicitud →
+          className="w-full py-2.5 rounded-[10px] text-primary-foreground text-sm font-bold disabled:opacity-30 hover:brightness-110 hover:-translate-y-px disabled:hover:translate-y-0 transition-all shadow-[var(--shadow-lift)] flex items-center justify-center gap-1.5"
+          style={{ background: "var(--gradient-primary)" }}>
+          Crear solicitud <ArrowRight className="w-4 h-4" />
         </button>
       </aside>
     </div>
@@ -370,8 +419,8 @@ function FamilyRow({ fam, carrito, toggle, showCat }: FamilyRowProps) {
   const tk = CAT_TOKEN[fam.cat] ?? "marmol";
   return (
     <div
-      className="flex items-center gap-2 flex-wrap py-2 px-3 rounded-[9px] bg-card border border-border/60 hover:bg-accent/40 transition-colors"
-      style={{ borderLeftWidth: 3, borderLeftColor: `hsl(var(--cat-${tk}))` }}
+      className="flex items-center gap-2 flex-wrap py-2.5 px-3 rounded-[11px] bg-card border border-border/60 hover:shadow-[var(--shadow-lift)] hover:-translate-y-px transition-all"
+      style={{ borderLeftWidth: 4, borderLeftColor: `hsl(var(--cat-${tk}))` }}
     >
       {showCat && (
         <span className="text-[10px] font-bold px-2 py-px rounded-full flex-shrink-0"
@@ -381,7 +430,7 @@ function FamilyRow({ fam, carrito, toggle, showCat }: FamilyRowProps) {
       )}
       <span className="text-[13px] font-semibold text-foreground flex-1 min-w-[120px]">{fam.fam}</span>
       {(fam.tp === "pieza" || fam.tp === "borde") && (
-        <span className="text-[10px] font-bold text-muted-foreground bg-muted px-2 py-px rounded-full flex-shrink-0">
+        <span className="text-[10px] font-bold text-muted-foreground bg-muted px-2 py-px rounded-full flex-shrink-0 uppercase tracking-wide">
           {fam.tp}
         </span>
       )}
@@ -391,19 +440,22 @@ function FamilyRow({ fam, carrito, toggle, showCat }: FamilyRowProps) {
           const inF = carrito.find(c => c.familiaId === fam.id && c.refIdx === idx && c.tipo === "ficha");
           const inP = carrito.find(c => c.familiaId === fam.id && c.refIdx === idx && c.tipo === "pieza");
           let label = ref.l;
-          let cls = "bg-muted text-muted-foreground border-transparent hover:border-primary hover:text-primary";
+          let cls = "bg-card border-border text-muted-foreground hover:border-primary hover:text-primary hover:bg-accent";
+          let selected = false;
           if (fam.tp === "pieza") {
-            if (inP) { label += " ✓"; cls = chipCls("pieza"); }
+            if (inP) { label += " ✓"; cls = chipSolid("pieza"); selected = true; }
           } else if (fam.tp === "borde") {
-            if (inM) { label += " ·10×15"; cls = chipCls("muestra"); }
-            else if (inF) { label += " ·pieza"; cls = chipCls("ficha"); }
+            if (inM) { label += " ·10×15"; cls = chipSolid("muestra"); selected = true; }
+            else if (inF) { label += " ·pieza"; cls = chipSolid("ficha"); selected = true; }
           } else {
-            if (inM) { label += " ·m"; cls = chipCls("muestra"); }
-            else if (inF) { label += " ·f"; cls = chipCls("ficha"); }
+            if (inM) { label += " ·m"; cls = chipSolid("muestra"); selected = true; }
+            else if (inF) { label += " ·f"; cls = chipSolid("ficha"); selected = true; }
           }
           return (
             <button key={idx} onClick={() => toggle(fam.id, idx, fam.tp)} title={`Cód: ${ref.cod}`}
-              className={`px-2.5 py-1 rounded-[7px] text-[12px] font-semibold border transition-all whitespace-nowrap ${cls}`}>
+              className={`px-2.5 py-1 rounded-[8px] text-[12px] font-semibold border transition-all whitespace-nowrap active:scale-95 ${
+                selected ? "scale-[1.04] shadow-sm" : ""
+              } ${cls}`}>
               {label}
             </button>
           );
@@ -413,10 +465,22 @@ function FamilyRow({ fam, carrito, toggle, showCat }: FamilyRowProps) {
   );
 }
 
+function MiniTag({ tipo, children }: { tipo: string; children: React.ReactNode }) {
+  return (
+    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${chipCls(tipo)}`}>{children}</span>
+  );
+}
+
 function chipCls(tipo: string) {
-  if (tipo === "muestra") return "bg-blue-50 text-blue-700 border-blue-300";
-  if (tipo === "ficha")   return "bg-emerald-50 text-emerald-700 border-emerald-300";
-  return "bg-violet-50 text-violet-700 border-violet-300";
+  if (tipo === "muestra") return "bg-muestra-bg text-muestra-value border-muestra-border";
+  if (tipo === "ficha")   return "bg-ficha-bg text-ficha-value border-ficha-border";
+  return "bg-pieza-bg text-pieza-value border-pieza-border";
+}
+
+function chipSolid(tipo: string) {
+  if (tipo === "muestra") return "bg-muestra-solid text-primary-foreground border-muestra-solid";
+  if (tipo === "ficha")   return "bg-ficha-solid text-primary-foreground border-ficha-solid";
+  return "bg-pieza-solid text-primary-foreground border-pieza-solid";
 }
 
 const fieldCls = "w-full bg-muted/50 border border-border rounded-[9px] px-3 py-2 text-[13px] outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors placeholder:text-muted-foreground";
@@ -440,7 +504,7 @@ function ToggleBtn({ active, urgent, onClick, children }: { active: boolean; urg
       className={`flex-1 py-2 rounded-[9px] text-[12px] font-semibold border transition-all ${
         active
           ? urgent ? "border-destructive bg-destructive/10 text-destructive" : "border-primary bg-primary/10 text-primary"
-          : "border-border bg-card text-muted-foreground"
+          : "border-border bg-card text-muted-foreground hover:border-primary/40"
       }`}>
       {children}
     </button>

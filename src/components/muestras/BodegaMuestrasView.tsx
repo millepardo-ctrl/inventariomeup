@@ -73,14 +73,14 @@ function SolicitudCard({ s, onDespachar }: { s: Solicitud; onDespachar: (id: str
 
   return (
     <div
-      className={`bg-card border border-border/60 rounded-xl px-4 py-3.5 flex flex-col gap-2.5 shadow-sm transition-opacity ${hecho ? "opacity-60" : ""}`}
+      className={`bg-card border border-border/60 rounded-xl px-4 py-3.5 flex flex-col gap-2.5 shadow-sm hover:shadow-[var(--shadow-lift)] transition-all ${hecho ? "opacity-60" : ""}`}
       style={{ borderLeftWidth: 3, borderLeftColor: urgente ? "hsl(var(--destructive))" : hecho ? "hsl(var(--cat-travertino))" : "hsl(var(--primary))" }}
     >
       {/* Header */}
       <div className="flex items-center gap-2 flex-wrap">
         <span className="font-bold text-[15px] text-foreground">{s.destinatario.nom || "Sin nombre"}</span>
         {urgente && <Badge cls="bg-destructive/15 text-destructive border-destructive/20">🚨 Urgente</Badge>}
-        <Badge cls={hecho ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-blue-50 text-blue-700 border-blue-200"}>
+        <Badge cls={hecho ? "bg-ficha-bg text-ficha-value border-ficha-border" : "bg-muestra-bg text-muestra-value border-muestra-border"}>
           {hecho ? "✓ Despachado" : "Pendiente"}
         </Badge>
         <span className="ml-auto text-[11px] text-muted-foreground font-mono">{fecha} {hora}</span>
@@ -104,8 +104,8 @@ function SolicitudCard({ s, onDespachar }: { s: Solicitud; onDespachar: (id: str
             <span className="text-primary text-xs">•</span>
             <span className="text-foreground/80">{it.referencia} — {it.acabado}</span>
             <span className={`text-[11px] font-bold px-1.5 py-px rounded-[5px] ml-auto ${
-              it.tipo === "muestra" ? "bg-blue-50 text-blue-700" :
-              it.tipo === "ficha"   ? "bg-emerald-50 text-emerald-700" : "bg-violet-50 text-violet-700"
+              it.tipo === "muestra" ? "bg-muestra-bg text-muestra-value" :
+              it.tipo === "ficha"   ? "bg-ficha-bg text-ficha-value" : "bg-pieza-bg text-pieza-value"
             }`}>
               {it.tipo === "muestra" ? "muestra 10×15" : it.tipo === "ficha" ? "ficha" : it.acabado}
             </span>
@@ -117,7 +117,8 @@ function SolicitudCard({ s, onDespachar }: { s: Solicitud; onDespachar: (id: str
       <button
         onClick={() => onDespachar(s.id)}
         disabled={hecho}
-        className="self-start mt-1 px-4 py-1.5 rounded-[9px] bg-primary text-primary-foreground text-xs font-bold disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
+        className="self-start mt-1 px-4 py-1.5 rounded-[9px] text-primary-foreground text-xs font-bold disabled:bg-muted disabled:bg-none disabled:text-muted-foreground disabled:cursor-not-allowed hover:brightness-110 transition-all shadow-sm"
+        style={hecho ? undefined : { background: "var(--gradient-primary)" }}
       >
         {hecho
           ? `✓ Despachado ${s.fechaDespacho ? new Date(s.fechaDespacho).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" }) : ""}`
