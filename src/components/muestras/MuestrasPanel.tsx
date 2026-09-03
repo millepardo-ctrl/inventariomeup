@@ -23,7 +23,9 @@ const MuestrasPanel = ({ onBack, asesorPreset }: Props) => {
 
   useEffect(() => {
     (async () => {
-      const { data: sols } = await supabase.from("solicitudes_muestras").const { data: sols } = await supabase.from("solicitudes_muestras").select("id, estado, fecha_solicitud");;
+      const { data: sols } = await supabase
+        .from("solicitudes_muestras")
+        .select("id, estado, created_at");
       if (!sols) return;
       const esMes = (f: string) => {
         const d = new Date(f);

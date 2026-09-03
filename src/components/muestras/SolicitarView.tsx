@@ -155,7 +155,7 @@ export default function SolicitarView({ asesorPreset }: Props) {
         dest_empresa: dest.emp || null,
         dest_direccion: dest.dir || null,
         dest_ciudad: dest.city || null,
-        dest_depto: dest.depto || null,: dest.depto || null,
+        dest_departamento: dest.depto || null,
         tipo_envio: envio,
         estado: "pendiente",
         origen: "panel",
