@@ -25,11 +25,11 @@ interface Solicitud {
   dest_empresa: string | null;
   dest_direccion: string | null;
   dest_ciudad: string | null;
-  dest_depto: string | null;
+  dest_departamento: string | null;
   tipo_envio: string;
   estado: string;
   origen: string;
-  fecha_solicitud: string;
+  created_at: string;
   fecha_despacho: string | null;
   items: Item[];
 }
@@ -58,7 +58,7 @@ function generarMensaje(s: Solicitud): string {
     s.dest_celular ? `📱 ${s.dest_celular}` : null,
     s.dest_empresa ? `🏢 ${s.dest_empresa}` : null,
     s.dest_direccion ? `📍 ${s.dest_direccion}` : null,
-    s.dest_ciudad ? `🏙 ${s.dest_ciudad}${s.dest_depto ? ", " + s.dest_depto : ""}` : null,
+    s.dest_ciudad ? `🏙 ${s.dest_ciudad}${s.dest_departamento ? ", " + s.dest_departamento : ""}` : null,
     `🚚 ${s.tipo_envio === "urgente" ? "🚨 URGENTE" : "Estándar"}`,
     ``,
     ...s.items.map((it) => {
@@ -73,7 +73,7 @@ function generarMensaje(s: Solicitud): string {
 
 function descargarGuia(s: Solicitud) {
   const ref = s.id.slice(0, 8).toUpperCase();
-  const fecha = new Date(s.fecha_solicitud).toLocaleDateString("es-CO", {
+  const fecha = new Date(s.created_at).toLocaleDateString("es-CO", {
     day: "2-digit",
     month: "long",
     year: "numeric",
@@ -141,7 +141,7 @@ ${urgente ? `<div class="urgente-banner">🚨 ENVÍO URGENTE — Atención prior
     ${s.dest_cedula ? `<p>CC ${s.dest_cedula}</p>` : ""}
     ${s.dest_empresa ? `<p>${s.dest_empresa}</p>` : ""}
     ${s.dest_direccion ? `<p>${s.dest_direccion}</p>` : ""}
-    <p>${[s.dest_ciudad, s.dest_depto].filter(Boolean).join(", ") || "—"}</p>
+    <p>${[s.dest_ciudad, s.dest_departamento].filter(Boolean).join(", ") || "—"}</p>
     ${s.dest_celular ? `<p>Cel: ${s.dest_celular}</p>` : ""}
     ${s.asesor_nombre ? `<p style="margin-top:8px;font-size:10px;color:#6b7280;">Asesor: ${s.asesor_nombre}</p>` : ""}
   </div>
@@ -178,7 +178,7 @@ export default function BodegaMuestrasView() {
     const { data: sols, error: errSols } = await supabase
       .from("solicitudes_muestras")
       .select("*")
-      .order("fecha_solicitud", { ascending: true });
+      .order("created_at", { ascending: true });
 
     if (errSols || !sols) {
       setLoading(false);
@@ -188,10 +188,10 @@ export default function BodegaMuestrasView() {
     const ids = sols.map((s: { id: string }) => s.id);
     const { data: items } = await supabase.from("solicitudes_items").select("*").in("solicitud_id", ids);
 
-    const merged: Solicitud[] = sols.map((s: Record<string, unknown>) => ({
+    const merged = (sols as unknown as Solicitud[]).map((s) => ({
       ...s,
-      items: (items || []).filter((it: Item) => it.solicitud_id === s.id),
-    })) as Solicitud[];
+      items: ((items || []) as unknown as Item[]).filter((it) => it.solicitud_id === s.id),
+    }));
 
     setLista(merged);
     setLoading(false);
@@ -204,20 +204,20 @@ export default function BodegaMuestrasView() {
   const filtrada = lista
     .filter((s) => {
       if (filtro === "pendiente") return s.estado === "pendiente";
-      if (filtro === "despachado_mes") return s.estado === "despachado" && esMesActual(s.fecha_solicitud);
-      if (filtro === "del_mes") return esMesActual(s.fecha_solicitud);
+      if (filtro === "despachado_mes") return s.estado === "despachado" && esMesActual(s.created_at);
+      if (filtro === "del_mes") return esMesActual(s.created_at);
       return true;
     })
     .sort((a, b) => {
       if (a.tipo_envio === "urgente" && b.tipo_envio !== "urgente") return -1;
       if (a.tipo_envio !== "urgente" && b.tipo_envio === "urgente") return 1;
-      return new Date(a.fecha_solicitud).getTime() - new Date(b.fecha_solicitud).getTime();
+      return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
     });
 
   const counts = {
     pendiente: lista.filter((s) => s.estado === "pendiente").length,
-    despachado_mes: lista.filter((s) => s.estado === "despachado" && esMesActual(s.fecha_solicitud)).length,
-    del_mes: lista.filter((s) => esMesActual(s.fecha_solicitud)).length,
+    despachado_mes: lista.filter((s) => s.estado === "despachado" && esMesActual(s.created_at)).length,
+    del_mes: lista.filter((s) => esMesActual(s.created_at)).length,
   };
 
   async function despachar(id: string) {
@@ -304,8 +304,8 @@ function SolicitudCard({
 }) {
   const urgente = s.tipo_envio === "urgente";
   const hecho = s.estado === "despachado";
-  const hora = new Date(s.fecha_solicitud).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" });
-  const fecha = new Date(s.fecha_solicitud).toLocaleDateString("es-CO", { day: "2-digit", month: "short" });
+  const hora = new Date(s.created_at).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" });
+  const fecha = new Date(s.created_at).toLocaleDateString("es-CO", { day: "2-digit", month: "short" });
 
   return (
     <div
@@ -344,7 +344,7 @@ function SolicitudCard({
       {(s.dest_direccion || s.dest_ciudad) && (
         <div className="text-[12px] text-muted-foreground flex gap-1">
           <span>📍</span>
-          <span>{[s.dest_direccion, s.dest_ciudad, s.dest_depto].filter(Boolean).join(" · ")}</span>
+          <span>{[s.dest_direccion, s.dest_ciudad, s.dest_departamento].filter(Boolean).join(" · ")}</span>
         </div>
       )}
       {s.dest_celular && <div className="text-[12px] text-muted-foreground">📱 {s.dest_celular}</div>}
