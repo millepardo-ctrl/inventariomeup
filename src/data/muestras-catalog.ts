@@ -68,8 +68,9 @@ export const CAT_TOKEN: Record<string, string> = {
 };
 
 export const ASESORES_MUESTRAS = [
-  "Carolina Ríos","David Montoya","Luisa Fernanda Cano",
-  "Mateo Gómez","Natalia Zapata","Sebastián Herrera",
+  "Andrea Arboleda","Johan Nicolas Avellaneda","John Vargas",
+  "Jose Vital","Juan Carlos Mejía","Miguel Pardo",
+  "Milena Pardo","Paola Ospina","Sami Pardo",
 ];
 
 export const CIUDADES = [
