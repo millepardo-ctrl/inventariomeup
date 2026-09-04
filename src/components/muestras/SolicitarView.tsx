@@ -259,7 +259,7 @@ export default function SolicitarView({ asesorPreset }: Props) {
         {/* Destinatario */}
         <section>
           <Label>Destinatario</Label>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Field label="Nombre completo">
               <input
                 value={dest.nom}
