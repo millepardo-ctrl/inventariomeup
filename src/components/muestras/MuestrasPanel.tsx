@@ -25,7 +25,7 @@ const MuestrasPanel = ({ onBack, asesorPreset }: Props) => {
     (async () => {
       const { data: sols } = await supabase
         .from("solicitudes_muestras")
-        .select("id, estado, fecha_solicitud");
+        .select("id, estado, created_at");
       if (!sols) return;
       const esMes = (f: string | null) => {
         if (!f) return false;
@@ -33,8 +33,8 @@ const MuestrasPanel = ({ onBack, asesorPreset }: Props) => {
         return d.getMonth() === hoy.getMonth() && d.getFullYear() === hoy.getFullYear();
       };
       const pend = sols.filter((s) => s.estado === "pendiente").length;
-      const delMesIds = sols.filter((s) => esMes(s.fecha_solicitud)).map((s) => s.id);
-      const desp = sols.filter((s) => s.estado === "despachado" && esMes(s.fecha_solicitud)).length;
+      const delMesIds = sols.filter((s) => esMes(s.created_at)).map((s) => s.id);
+      const desp = sols.filter((s) => s.estado === "despachado" && esMes(s.created_at)).length;
       setPendientes(pend);
       setDespachadasMes(desp);
       if (delMesIds.length > 0) {
