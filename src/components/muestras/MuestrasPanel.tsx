@@ -27,7 +27,8 @@ const MuestrasPanel = ({ onBack, asesorPreset }: Props) => {
         .from("solicitudes_muestras")
         .select("id, estado, fecha_solicitud");
       if (!sols) return;
-      const esMes = (f: string) => {
+      const esMes = (f: string | null) => {
+        if (!f) return false;
         const d = new Date(f);
         return d.getMonth() === hoy.getMonth() && d.getFullYear() === hoy.getFullYear();
       };
