@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Copy, FileDown } from "lucide-react";
+import { Copy, FileDown, Trash2 } from "lucide-react";
 import meupLogo from "@/assets/logo-meup.png";
 import { supabaseMuestras as supabase } from "@/integrations/supabase/muestras";
 import { useToast } from "@/hooks/use-toast";
@@ -243,6 +243,18 @@ export default function BodegaMuestrasView() {
     }
   }
 
+  async function eliminar(id: string) {
+    if (!window.confirm("¿Eliminar esta solicitud? Esta acción no se puede deshacer.")) return;
+    await supabase.from("solicitudes_items").delete().eq("solicitud_id", id);
+    const { error } = await supabase.from("solicitudes_muestras").delete().eq("id", id);
+    if (error) {
+      toast({ title: "No se pudo eliminar", description: error.message, variant: "destructive" });
+      return;
+    }
+    setLista((prev) => prev.filter((s) => s.id !== id));
+    toast({ title: "Solicitud eliminada" });
+  }
+
   function copiarTelegram(s: Solicitud) {
     navigator.clipboard
       .writeText(generarMensaje(s))
@@ -342,7 +354,14 @@ export default function BodegaMuestrasView() {
       ) : (
         <div className="flex flex-col gap-3">
           {filtrada.map((s) => (
-            <SolicitudCard key={s.id} s={s} onDespachar={despachar} onCopiar={copiarTelegram} onGuia={descargarGuia} />
+            <SolicitudCard
+              key={s.id}
+              s={s}
+              onDespachar={despachar}
+              onCopiar={copiarTelegram}
+              onGuia={descargarGuia}
+              onEliminar={eliminar}
+            />
           ))}
         </div>
       )}
@@ -355,11 +374,13 @@ function SolicitudCard({
   onDespachar,
   onCopiar,
   onGuia,
+  onEliminar,
 }: {
   s: Solicitud;
   onDespachar: (id: string) => void;
   onCopiar: (s: Solicitud) => void;
   onGuia: (s: Solicitud) => void;
+  onEliminar: (id: string) => void;
 }) {
   const urgente = s.tipo_envio === "urgente";
   const hecho = s.estado === "despachado";
@@ -464,6 +485,13 @@ function SolicitudCard({
           className="flex items-center gap-1 px-3 py-1.5 rounded-[9px] text-xs font-semibold border border-border bg-card text-muted-foreground hover:border-primary hover:text-primary transition-all"
         >
           <FileDown className="w-3 h-3" /> Guía
+        </button>
+        <button
+          onClick={() => onEliminar(s.id)}
+          title="Eliminar solicitud"
+          className="flex items-center gap-1 px-3 py-1.5 rounded-[9px] text-xs font-semibold border border-border bg-card text-muted-foreground hover:border-destructive hover:text-destructive transition-all"
+        >
+          <Trash2 className="w-3 h-3" />
         </button>
       </div>
     </div>
