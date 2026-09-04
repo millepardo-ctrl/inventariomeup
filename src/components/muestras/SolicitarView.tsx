@@ -342,16 +342,8 @@ export default function SolicitarView({ asesorPreset }: Props) {
 
         {/* Kits */}
         <section>
-          <div className="flex items-center gap-2 mb-2">
-            <Label>Kits rápidos</Label>
-            <button
-              onClick={() => applyKit("clear")}
-              className="ml-auto -mt-2 flex items-center gap-1.5 px-2.5 py-1 rounded-[9px] text-[11px] font-semibold border border-dashed border-border bg-card text-muted-foreground hover:border-destructive hover:text-destructive hover:bg-destructive/5 transition-all"
-            >
-              <Trash2 className="w-3 h-3" /> Limpiar
-            </button>
-          </div>
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+          <Label>Kits rápidos</Label>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
             {KIT_META.map(({ k, label, emoji }) => (
               <button
                 key={k}
