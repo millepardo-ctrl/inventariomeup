@@ -169,8 +169,12 @@ ${urgente ? `<div class="urgente-banner">🚨 ENVÍO URGENTE — Atención prior
 export default function BodegaMuestrasView() {
   const { toast } = useToast();
   const [filtro, setFiltro] = useState<Filtro>("pendiente");
+  const [asesorSel, setAsesorSel] = useState("");
+  const [ciudadSel, setCiudadSel] = useState("");
+  const [orden, setOrden] = useState<"reciente" | "antiguo">("reciente");
   const [lista, setLista] = useState<Solicitud[]>([]);
   const [loading, setLoading] = useState(true);
+
 
   const cargar = useCallback(async () => {
     setLoading(true);
