@@ -61,53 +61,50 @@ export type Database = {
       solicitudes_muestras: {
         Row: {
           asesor_nombre: string | null
+          created_at: string
           dest_cedula: string | null
           dest_celular: string | null
           dest_ciudad: string | null
-          dest_depto: string | null
+          dest_departamento: string | null
           dest_direccion: string | null
           dest_empresa: string | null
           dest_nombre: string | null
           estado: string
           fecha_despacho: string | null
-          fecha_solicitud: string | null
           id: string
           origen: string
-          telegram_chat_id: string | null
           tipo_envio: string
         }
         Insert: {
           asesor_nombre?: string | null
+          created_at?: string
           dest_cedula?: string | null
           dest_celular?: string | null
           dest_ciudad?: string | null
-          dest_depto?: string | null
+          dest_departamento?: string | null
           dest_direccion?: string | null
           dest_empresa?: string | null
           dest_nombre?: string | null
           estado?: string
           fecha_despacho?: string | null
-          fecha_solicitud?: string | null
           id?: string
           origen?: string
-          telegram_chat_id?: string | null
           tipo_envio?: string
         }
         Update: {
           asesor_nombre?: string | null
+          created_at?: string
           dest_cedula?: string | null
           dest_celular?: string | null
           dest_ciudad?: string | null
-          dest_depto?: string | null
+          dest_departamento?: string | null
           dest_direccion?: string | null
           dest_empresa?: string | null
           dest_nombre?: string | null
           estado?: string
           fecha_despacho?: string | null
-          fecha_solicitud?: string | null
           id?: string
           origen?: string
-          telegram_chat_id?: string | null
           tipo_envio?: string
         }
         Relationships: []
