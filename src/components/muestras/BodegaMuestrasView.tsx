@@ -169,8 +169,12 @@ ${urgente ? `<div class="urgente-banner">🚨 ENVÍO URGENTE — Atención prior
 export default function BodegaMuestrasView() {
   const { toast } = useToast();
   const [filtro, setFiltro] = useState<Filtro>("pendiente");
+  const [asesorSel, setAsesorSel] = useState("");
+  const [ciudadSel, setCiudadSel] = useState("");
+  const [orden, setOrden] = useState<"reciente" | "antiguo">("reciente");
   const [lista, setLista] = useState<Solicitud[]>([]);
   const [loading, setLoading] = useState(true);
+
 
   const cargar = useCallback(async () => {
     setLoading(true);
@@ -202,8 +206,13 @@ export default function BodegaMuestrasView() {
     cargar();
   }, [cargar]);
 
+  const asesores = Array.from(new Set(lista.map((s) => s.asesor_nombre).filter(Boolean) as string[])).sort();
+  const ciudades = Array.from(new Set(lista.map((s) => s.dest_ciudad).filter(Boolean) as string[])).sort();
+
   const filtrada = lista
     .filter((s) => {
+      if (asesorSel && s.asesor_nombre !== asesorSel) return false;
+      if (ciudadSel && s.dest_ciudad !== ciudadSel) return false;
       if (filtro === "pendiente") return s.estado === "pendiente";
       if (filtro === "despachado_mes") return s.estado === "despachado" && esMesActual(s.fecha_solicitud);
       if (filtro === "del_mes") return esMesActual(s.fecha_solicitud);
@@ -212,8 +221,10 @@ export default function BodegaMuestrasView() {
     .sort((a, b) => {
       if (a.tipo_envio === "urgente" && b.tipo_envio !== "urgente") return -1;
       if (a.tipo_envio !== "urgente" && b.tipo_envio === "urgente") return 1;
-      return new Date(a.fecha_solicitud).getTime() - new Date(b.fecha_solicitud).getTime();
+      const diff = new Date(a.fecha_solicitud).getTime() - new Date(b.fecha_solicitud).getTime();
+      return orden === "reciente" ? -diff : diff;
     });
+
 
   const counts = {
     pendiente: lista.filter((s) => s.estado === "pendiente").length,
@@ -273,6 +284,53 @@ export default function BodegaMuestrasView() {
           ↻ Actualizar
         </button>
       </div>
+
+      <div className="flex items-center gap-2 flex-wrap">
+        <select
+          value={asesorSel}
+          onChange={(e) => setAsesorSel(e.target.value)}
+          className="bg-background border border-border rounded-[8px] px-2 py-1.5 text-[12px] text-foreground"
+        >
+          <option value="">Todos los asesores</option>
+          {asesores.map((a) => (
+            <option key={a} value={a}>
+              {a}
+            </option>
+          ))}
+        </select>
+        <select
+          value={ciudadSel}
+          onChange={(e) => setCiudadSel(e.target.value)}
+          className="bg-background border border-border rounded-[8px] px-2 py-1.5 text-[12px] text-foreground"
+        >
+          <option value="">Todas las ciudades</option>
+          {ciudades.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
+        <select
+          value={orden}
+          onChange={(e) => setOrden(e.target.value as "reciente" | "antiguo")}
+          className="bg-background border border-border rounded-[8px] px-2 py-1.5 text-[12px] text-foreground"
+        >
+          <option value="reciente">Más reciente primero</option>
+          <option value="antiguo">Más antigua primero</option>
+        </select>
+        {(asesorSel || ciudadSel) && (
+          <button
+            onClick={() => {
+              setAsesorSel("");
+              setCiudadSel("");
+            }}
+            className="text-[11px] text-muted-foreground hover:text-destructive transition-colors"
+          >
+            Limpiar filtros
+          </button>
+        )}
+      </div>
+
 
       {loading ? (
         <div className="text-center py-16 text-muted-foreground text-sm">Cargando...</div>
@@ -338,8 +396,11 @@ function SolicitudCard({
         </span>
       </div>
 
-      {/* Asesor — debajo de la fila de fecha */}
-      <div className="text-[11px] text-muted-foreground">{s.asesor_nombre || "Asesor desconocido"}</div>
+      {/* Asesor — justo debajo de la fecha de creación */}
+      <div className="-mt-2 text-right text-[11px] text-muted-foreground">
+        {s.asesor_nombre || "Asesor desconocido"}
+      </div>
+
 
       {/* Dirección */}
       {(s.dest_direccion || s.dest_ciudad) && (
@@ -383,7 +444,7 @@ function SolicitudCard({
         <button
           onClick={() => onDespachar(s.id)}
           disabled={hecho}
-          className="flex-1 py-1.5 rounded-[9px] text-primary-foreground text-xs font-bold disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed hover:brightness-110 transition-all shadow-sm"
+          className="basis-1/2 shrink-0 py-1 px-2 rounded-[9px] text-primary-foreground text-[11px] font-bold disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed hover:brightness-110 transition-all shadow-sm"
           style={hecho ? undefined : { background: "var(--gradient-primary)" }}
         >
           {hecho
