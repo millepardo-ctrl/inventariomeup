@@ -396,8 +396,11 @@ function SolicitudCard({
         </span>
       </div>
 
-      {/* Asesor — debajo de la fila de fecha */}
-      <div className="text-[11px] text-muted-foreground">{s.asesor_nombre || "Asesor desconocido"}</div>
+      {/* Asesor — justo debajo de la fecha de creación */}
+      <div className="-mt-2 text-right text-[11px] text-muted-foreground">
+        {s.asesor_nombre || "Asesor desconocido"}
+      </div>
+
 
       {/* Dirección */}
       {(s.dest_direccion || s.dest_ciudad) && (
