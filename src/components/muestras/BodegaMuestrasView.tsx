@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Copy, FileDown } from "lucide-react";
 import meupLogo from "@/assets/logo-meup.png";
-import { supabase } from "@/integrations/supabase/client";
+import { supabaseMuestras as supabase } from "@/integrations/supabase/muestras";
 import { useToast } from "@/hooks/use-toast";
 
 type Filtro = "pendiente" | "despachado_mes" | "del_mes";

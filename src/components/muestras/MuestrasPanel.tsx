@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Package, Warehouse, BarChart3, ArrowLeft, Sparkles, Send, Truck } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabaseMuestras as supabase } from "@/integrations/supabase/muestras";
 import meupLogo from "@/assets/logo-meup.png";
 import SolicitarView from "./SolicitarView";
 import BodegaMuestrasView from "./BodegaMuestrasView";
