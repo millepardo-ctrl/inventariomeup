@@ -206,8 +206,13 @@ export default function BodegaMuestrasView() {
     cargar();
   }, [cargar]);
 
+  const asesores = Array.from(new Set(lista.map((s) => s.asesor_nombre).filter(Boolean) as string[])).sort();
+  const ciudades = Array.from(new Set(lista.map((s) => s.dest_ciudad).filter(Boolean) as string[])).sort();
+
   const filtrada = lista
     .filter((s) => {
+      if (asesorSel && s.asesor_nombre !== asesorSel) return false;
+      if (ciudadSel && s.dest_ciudad !== ciudadSel) return false;
       if (filtro === "pendiente") return s.estado === "pendiente";
       if (filtro === "despachado_mes") return s.estado === "despachado" && esMesActual(s.fecha_solicitud);
       if (filtro === "del_mes") return esMesActual(s.fecha_solicitud);
@@ -216,8 +221,10 @@ export default function BodegaMuestrasView() {
     .sort((a, b) => {
       if (a.tipo_envio === "urgente" && b.tipo_envio !== "urgente") return -1;
       if (a.tipo_envio !== "urgente" && b.tipo_envio === "urgente") return 1;
-      return new Date(a.fecha_solicitud).getTime() - new Date(b.fecha_solicitud).getTime();
+      const diff = new Date(a.fecha_solicitud).getTime() - new Date(b.fecha_solicitud).getTime();
+      return orden === "reciente" ? -diff : diff;
     });
+
 
   const counts = {
     pendiente: lista.filter((s) => s.estado === "pendiente").length,
