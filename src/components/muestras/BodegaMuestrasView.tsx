@@ -444,7 +444,7 @@ function SolicitudCard({
         <button
           onClick={() => onDespachar(s.id)}
           disabled={hecho}
-          className="flex-1 py-1.5 rounded-[9px] text-primary-foreground text-xs font-bold disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed hover:brightness-110 transition-all shadow-sm"
+          className="basis-1/2 shrink-0 py-1 px-2 rounded-[9px] text-primary-foreground text-[11px] font-bold disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed hover:brightness-110 transition-all shadow-sm"
           style={hecho ? undefined : { background: "var(--gradient-primary)" }}
         >
           {hecho
