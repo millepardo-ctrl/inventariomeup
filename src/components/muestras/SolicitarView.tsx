@@ -226,13 +226,13 @@ export default function SolicitarView({ asesorPreset }: Props) {
   );
 
   return (
-    <div className="max-w-[1400px] mx-auto flex gap-0 h-[calc(100vh-125px)]">
+    <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row gap-0 lg:h-[calc(100vh-125px)]">
       {/* LEFT: form + catalog */}
-      <div className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-5 border-r border-border">
+      <div className="flex-1 lg:overflow-y-auto px-4 sm:px-5 py-4 flex flex-col gap-5 lg:border-r border-border">
         {/* Asesor + envío */}
         <section>
           <Label>Asesor y envío</Label>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Field label="Asesor">
               <select value={asesor} onChange={(e) => setAsesor(e.target.value)} className={fieldCls}>
                 <option value="">— selecciona —</option>
