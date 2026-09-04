@@ -285,6 +285,53 @@ export default function BodegaMuestrasView() {
         </button>
       </div>
 
+      <div className="flex items-center gap-2 flex-wrap">
+        <select
+          value={asesorSel}
+          onChange={(e) => setAsesorSel(e.target.value)}
+          className="bg-background border border-border rounded-[8px] px-2 py-1.5 text-[12px] text-foreground"
+        >
+          <option value="">Todos los asesores</option>
+          {asesores.map((a) => (
+            <option key={a} value={a}>
+              {a}
+            </option>
+          ))}
+        </select>
+        <select
+          value={ciudadSel}
+          onChange={(e) => setCiudadSel(e.target.value)}
+          className="bg-background border border-border rounded-[8px] px-2 py-1.5 text-[12px] text-foreground"
+        >
+          <option value="">Todas las ciudades</option>
+          {ciudades.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
+        <select
+          value={orden}
+          onChange={(e) => setOrden(e.target.value as "reciente" | "antiguo")}
+          className="bg-background border border-border rounded-[8px] px-2 py-1.5 text-[12px] text-foreground"
+        >
+          <option value="reciente">Más reciente primero</option>
+          <option value="antiguo">Más antigua primero</option>
+        </select>
+        {(asesorSel || ciudadSel) && (
+          <button
+            onClick={() => {
+              setAsesorSel("");
+              setCiudadSel("");
+            }}
+            className="text-[11px] text-muted-foreground hover:text-destructive transition-colors"
+          >
+            Limpiar filtros
+          </button>
+        )}
+      </div>
+
+
       {loading ? (
         <div className="text-center py-16 text-muted-foreground text-sm">Cargando...</div>
       ) : filtrada.length === 0 ? (
