@@ -12,7 +12,7 @@ import {
   TipoMuestra,
   SolicitudItem,
 } from "@/data/muestras-catalog";
-import { supabase } from "@/integrations/supabase/client";
+import { supabaseMuestras as supabase } from "@/integrations/supabase/muestras";
 import { useToast } from "@/hooks/use-toast";
 
 interface Props {
