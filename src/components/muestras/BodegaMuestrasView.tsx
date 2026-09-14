@@ -17,9 +17,21 @@ interface Item {
   m2_unitario: number | null;
 }
 
+const RESPONSABLES = [
+  "Bodega Bquilla - Jeison",
+  "Bodega Cucutá - Manuel",
+  "CEB - Juan Carlos",
+  "CEC - John",
+  "CEM - Andrea",
+  "CEM - Paola",
+  "CEM - Miguel",
+  "CECTG - José",
+];
+
 interface Solicitud {
   id: string;
   asesor_nombre: string | null;
+  comentarios: string | null;
   dest_nombre: string | null;
   dest_cedula: string | null;
   dest_celular: string | null;
@@ -32,6 +44,7 @@ interface Solicitud {
   origen: string;
   fecha_solicitud: string;
   fecha_despacho: string | null;
+  responsable: string | null;
   items: Item[];
 }
 
@@ -255,6 +268,16 @@ export default function BodegaMuestrasView() {
     toast({ title: "Solicitud eliminada" });
   }
 
+  async function asignarResponsable(id: string, responsable: string) {
+    const { error } = await supabase
+      .from("solicitudes_muestras")
+      .update({ responsable: responsable || null })
+      .eq("id", id);
+    if (!error) {
+      setLista((prev) => prev.map((s) => (s.id === id ? { ...s, responsable: responsable || null } : s)));
+    }
+  }
+
   function copiarTelegram(s: Solicitud) {
     navigator.clipboard
       .writeText(generarMensaje(s))
@@ -361,6 +384,7 @@ export default function BodegaMuestrasView() {
               onCopiar={copiarTelegram}
               onGuia={descargarGuia}
               onEliminar={eliminar}
+              onAsignarResponsable={asignarResponsable}
             />
           ))}
         </div>
@@ -375,12 +399,14 @@ function SolicitudCard({
   onCopiar,
   onGuia,
   onEliminar,
+  onAsignarResponsable,
 }: {
   s: Solicitud;
   onDespachar: (id: string) => void;
   onCopiar: (s: Solicitud) => void;
   onGuia: (s: Solicitud) => void;
   onEliminar: (id: string) => void;
+  onAsignarResponsable: (id: string, responsable: string) => void;
 }) {
   const urgente = s.tipo_envio === "urgente";
   const hecho = s.estado === "despachado";
@@ -460,39 +486,60 @@ function SolicitudCard({
         })}
       </div>
 
+      {/* Comentarios */}
+      {s.comentarios && (
+        <div className="text-[12px] text-muted-foreground bg-muted/50 rounded-[8px] px-3 py-2 border border-border/50">
+          💬 {s.comentarios}
+        </div>
+      )}
+
       {/* Acciones */}
-      <div className="flex gap-2 mt-1">
-        <button
-          onClick={() => onDespachar(s.id)}
-          disabled={hecho}
-          className="basis-1/2 shrink-0 py-1 px-2 rounded-[9px] text-primary-foreground text-[11px] font-bold disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed hover:brightness-110 transition-all shadow-sm"
-          style={hecho ? undefined : { background: "var(--gradient-primary)" }}
-        >
-          {hecho
-            ? `✓ ${s.fecha_despacho ? new Date(s.fecha_despacho).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" }) : "Despachado"}`
-            : "Marcar como despachado"}
-        </button>
-        <button
-          onClick={() => onCopiar(s)}
-          title="Copiar mensaje"
-          className="flex items-center gap-1 px-3 py-1.5 rounded-[9px] text-xs font-semibold border border-border bg-card text-muted-foreground hover:border-primary hover:text-primary transition-all"
-        >
-          <Copy className="w-3 h-3" /> Copiar
-        </button>
-        <button
-          onClick={() => onGuia(s)}
-          title="Descargar guía PDF"
-          className="flex items-center gap-1 px-3 py-1.5 rounded-[9px] text-xs font-semibold border border-border bg-card text-muted-foreground hover:border-primary hover:text-primary transition-all"
-        >
-          <FileDown className="w-3 h-3" /> Guía
-        </button>
-        <button
-          onClick={() => onEliminar(s.id)}
-          title="Eliminar solicitud"
-          className="flex items-center gap-1 px-3 py-1.5 rounded-[9px] text-xs font-semibold border border-border bg-card text-muted-foreground hover:border-destructive hover:text-destructive transition-all"
-        >
-          <Trash2 className="w-3 h-3" />
-        </button>
+      <div className="flex flex-col gap-2 mt-1">
+        <div className="flex gap-2">
+          <button
+            onClick={() => onDespachar(s.id)}
+            disabled={hecho}
+            className="basis-1/2 shrink-0 py-1 px-2 rounded-[9px] text-primary-foreground text-[11px] font-bold disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed hover:brightness-110 transition-all shadow-sm"
+            style={hecho ? undefined : { background: "var(--gradient-primary)" }}
+          >
+            {hecho
+              ? `✓ ${s.fecha_despacho ? new Date(s.fecha_despacho).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" }) : "Despachado"}`
+              : "Marcar como despachado"}
+          </button>
+          <select
+            value={s.responsable ?? ""}
+            onChange={(e) => onAsignarResponsable(s.id, e.target.value)}
+            className="basis-1/2 shrink-0 bg-background border border-border rounded-[9px] px-2 text-[11px] text-foreground"
+          >
+            <option value="">— Asignar responsable —</option>
+            {RESPONSABLES.map((r) => (
+              <option key={r} value={r}>{r}</option>
+            ))}
+          </select>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => onCopiar(s)}
+            title="Copiar mensaje"
+            className="flex items-center gap-1 px-3 py-1.5 rounded-[9px] text-xs font-semibold border border-border bg-card text-muted-foreground hover:border-primary hover:text-primary transition-all"
+          >
+            <Copy className="w-3 h-3" /> Copiar
+          </button>
+          <button
+            onClick={() => onGuia(s)}
+            title="Descargar guía PDF"
+            className="flex items-center gap-1 px-3 py-1.5 rounded-[9px] text-xs font-semibold border border-border bg-card text-muted-foreground hover:border-primary hover:text-primary transition-all"
+          >
+            <FileDown className="w-3 h-3" /> Guía
+          </button>
+          <button
+            onClick={() => onEliminar(s.id)}
+            title="Eliminar solicitud"
+            className="flex items-center gap-1 px-3 py-1.5 rounded-[9px] text-xs font-semibold border border-border bg-card text-muted-foreground hover:border-destructive hover:text-destructive transition-all"
+          >
+            <Trash2 className="w-3 h-3" />
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -61,6 +61,7 @@ export type Database = {
       solicitudes_muestras: {
         Row: {
           asesor_nombre: string | null
+          comentarios: string | null
           dest_cedula: string | null
           dest_celular: string | null
           dest_ciudad: string | null
@@ -73,11 +74,13 @@ export type Database = {
           fecha_solicitud: string
           id: string
           origen: string
+          responsable: string | null
           telegram_chat_id: string | null
           tipo_envio: string
         }
         Insert: {
           asesor_nombre?: string | null
+          comentarios?: string | null
           dest_cedula?: string | null
           dest_celular?: string | null
           dest_ciudad?: string | null
@@ -90,11 +93,13 @@ export type Database = {
           fecha_solicitud?: string
           id?: string
           origen?: string
+          responsable?: string | null
           telegram_chat_id?: string | null
           tipo_envio?: string
         }
         Update: {
           asesor_nombre?: string | null
+          comentarios?: string | null
           dest_cedula?: string | null
           dest_celular?: string | null
           dest_ciudad?: string | null
@@ -107,6 +112,7 @@ export type Database = {
           fecha_solicitud?: string
           id?: string
           origen?: string
+          responsable?: string | null
           telegram_chat_id?: string | null
           tipo_envio?: string
         }

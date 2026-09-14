@@ -38,6 +38,7 @@ export default function SolicitarView({ asesorPreset }: Props) {
   const [carrito, setCarrito] = useState<CarritoItem[]>([]);
   const [cat, setCat] = useState<string>("Mármol");
   const [srch, setSrch] = useState("");
+  const [comentarios, setComentarios] = useState("");
   const [cityInput, setCityInput] = useState("");
   const [cityDrop, setCityDrop] = useState<{ c: string; d: string }[]>([]);
   const [dropOpen, setDropOpen] = useState(false);
@@ -159,6 +160,7 @@ export default function SolicitarView({ asesorPreset }: Props) {
         tipo_envio: envio,
         estado: "pendiente",
         origen: "panel",
+        comentarios: comentarios.trim() || null,
       })
       .select()
       .single();
@@ -183,6 +185,7 @@ export default function SolicitarView({ asesorPreset }: Props) {
     setCarrito([]);
     setDest({ ...EMPTY_DEST });
     setCityInput("");
+    setComentarios("");
     toast({ title: "🎉 Solicitud creada", description: `${items.length} referencias enviadas a bodega.` });
   }
 
@@ -336,6 +339,18 @@ export default function SolicitarView({ asesorPreset }: Props) {
               />
             </Field>
           </div>
+        </section>
+
+        {/* Comentarios */}
+        <section>
+          <Label>Observaciones <span className="text-muted-foreground font-normal">(opcional)</span></Label>
+          <textarea
+            value={comentarios}
+            onChange={(e) => setComentarios(e.target.value)}
+            rows={3}
+            className={`${fieldCls} resize-none`}
+            placeholder="Ej: Empaque especial, instrucciones de entrega, referencia adicional…"
+          />
         </section>
 
         <hr className="border-border" />
