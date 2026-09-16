@@ -3,10 +3,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import Dashboard from "@/components/inventory/Dashboard";
 import BodegaView from "@/components/bodega/BodegaView";
 import MuestrasPanel from "@/components/muestras/MuestrasPanel";
+import OfertasView from "@/components/ofertas/OfertasView";
 import { useGoogleSheetProducts } from "@/hooks/useGoogleSheetProducts";
 import logoMeup from "@/assets/logo-meup.png";
 
-type View = "inventario" | "bodega" | "muestras";
+type View = "inventario" | "bodega" | "muestras" | "ofertas";
 
 const Index = () => {
   const { user, logout, isAdmin } = useAuth();
@@ -52,6 +53,10 @@ const Index = () => {
     return <MuestrasPanel onBack={() => setView("inventario")} asesorPreset={user!.nombre} />;
   }
 
+  if (view === "ofertas" && isAdmin) {
+    return <OfertasView onBack={() => setView("inventario")} />;
+  }
+
   return (
     <Dashboard
       user={appUser}
@@ -62,6 +67,7 @@ const Index = () => {
       onLogout={logout}
       onOpenBodega={isAdmin ? () => setView("bodega") : undefined}
       onOpenMuestras={isAdmin ? () => setView("muestras") : undefined}
+      onOpenOfertas={isAdmin ? () => setView("ofertas") : undefined}
     />
   );
 };

@@ -10,6 +10,7 @@ interface DashboardHeaderProps {
   onRefresh?: () => void;
   onOpenBodega?: () => void;
   onOpenMuestras?: () => void;
+  onOpenOfertas?: () => void;
 }
 
 const extractCompany = (email: string) => {
@@ -18,7 +19,7 @@ const extractCompany = (email: string) => {
   return name.charAt(0).toUpperCase() + name.slice(1);
 };
 
-const DashboardHeader = ({ user, onLogout, refreshing, lastUpdated, onRefresh, onOpenBodega, onOpenMuestras }: DashboardHeaderProps) => {
+const DashboardHeader = ({ user, onLogout, refreshing, lastUpdated, onRefresh, onOpenBodega, onOpenMuestras, onOpenOfertas }: DashboardHeaderProps) => {
   const isVendedor = user.type === "vendedor";
   const timeStr = lastUpdated
     ? lastUpdated.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit", hour12: false })
@@ -57,6 +58,16 @@ const DashboardHeader = ({ user, onLogout, refreshing, lastUpdated, onRefresh, o
           >
             📊 Google Sheet
           </a>
+        )}
+
+        {/* Ofertas (admin only) */}
+        {isVendedor && onOpenOfertas && (
+          <button
+            onClick={onOpenOfertas}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[hsl(280,60%,18%)] border border-[hsl(280,60%,35%)] rounded-[9px] text-[hsl(280,80%,78%)] text-xs font-semibold hover:opacity-90 transition-opacity uppercase tracking-wider"
+          >
+            💼 Ofertas
+          </button>
         )}
 
         {/* Muestras (admin only) */}
