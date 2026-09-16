@@ -40,11 +40,20 @@ async function tgGetFile(fileId: string): Promise<ArrayBuffer> {
 
 // ─── Claude helpers ───────────────────────────────────────────────────────────
 
+function toBase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
 async function claude(prompt: string, pdfBytes?: ArrayBuffer): Promise<string> {
   const content: unknown[] = [];
 
   if (pdfBytes) {
-    const b64 = btoa(String.fromCharCode(...new Uint8Array(pdfBytes)));
+    const b64 = toBase64(pdfBytes);
     content.push({
       type: "document",
       source: { type: "base64", media_type: "application/pdf", data: b64 },
@@ -59,6 +68,7 @@ async function claude(prompt: string, pdfBytes?: ArrayBuffer): Promise<string> {
       "Content-Type": "application/json",
       "x-api-key": ANTHROPIC,
       "anthropic-version": "2023-06-01",
+      "anthropic-beta": "pdfs-2024-09-25",
     },
     body: JSON.stringify({
       model: "claude-haiku-4-5-20251001",
