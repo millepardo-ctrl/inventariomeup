@@ -81,14 +81,14 @@ const WelcomeScreen = ({ onNavigate }: WelcomeScreenProps) => {
           </p>
         </div>
 
-        <p className="text-[10.5px] font-bold uppercase tracking-[0.18em] text-header-foreground/45 mb-5">
+        <p className="text-[10.5px] font-bold uppercase tracking-[0.18em] text-header-foreground mb-5">
           ¿Qué deseas hacer hoy?
         </p>
 
         <div className={`grid grid-cols-1 sm:grid-cols-2 gap-3.5 w-full ${isBodega ? "max-w-[440px]" : "max-w-[560px]"}`}>
           <TileButton
             accent="213 95% 62%"
-            Icon={Boxes}
+            emoji={isBodega ? "🏭" : "🔍"}
             label={isBodega ? "Vista Bodega" : "Consultar inventario"}
             description={isBodega ? "Pedidos, despachos y control de stock" : "Disponibilidad en BAQ · CUC · En tránsito"}
             onClick={() => onNavigate(isBodega ? "bodega" : "inventario")}
@@ -96,7 +96,7 @@ const WelcomeScreen = ({ onNavigate }: WelcomeScreenProps) => {
 
           <TileButton
             accent="160 70% 52%"
-            Icon={Palette}
+            emoji="📦"
             label="Solicitar muestra"
             description="Pide muestras por referencia al almacén"
             onClick={() => onNavigate("muestras")}
@@ -105,7 +105,7 @@ const WelcomeScreen = ({ onNavigate }: WelcomeScreenProps) => {
           {!isBodega && (
             <TileButton
               accent="280 75% 68%"
-              Icon={Zap}
+              emoji="⚡"
               label="Motor de Oferta"
               description="Calcula precios, márgenes y descuentos"
               onClick={() => onNavigate("ofertas")}
@@ -115,7 +115,7 @@ const WelcomeScreen = ({ onNavigate }: WelcomeScreenProps) => {
           {!isBodega && (
             <TileButton
               accent="32 92% 62%"
-              Icon={MessageSquare}
+              emoji="💬"
               label="Asistente oferta"
               description="Cotiza por chat con IA · Sube el RUT y listo"
               onClick={() => onNavigate("asistente")}
