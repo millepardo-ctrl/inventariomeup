@@ -29,9 +29,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const login = useCallback(async (email: string, password: string): Promise<boolean> => {
+  const login = useCallback(async (rawEmail: string, password: string): Promise<boolean> => {
     setLoading(true);
     setError(null);
+
+    // permite escribir solo el usuario (ej. "milena") además del correo completo
+    const cleaned = rawEmail.trim().toLowerCase();
+    const email = cleaned.includes("@") ? cleaned : `${cleaned}@meup.co`;
 
     // 1) Hoja de usuarios (fuente principal)
     try {

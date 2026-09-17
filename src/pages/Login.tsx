@@ -38,7 +38,7 @@ const Login = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && canSubmit && handleLogin()}
-            placeholder="tu@empresa.com"
+            placeholder="tu@meup.co o solo tu usuario"
             className="w-full px-3.5 py-2.5 bg-secondary border border-landing-border rounded-[10px] text-header-foreground text-sm font-sans outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground"
           />
         </div>
