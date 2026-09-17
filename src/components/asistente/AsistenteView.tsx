@@ -29,7 +29,7 @@ function renderMarkdown(text: string): string {
   return text
     .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
     .replace(/\*(.*?)\*/g, "<em>$1</em>")
-    .replace(/`(.*?)`/g, '<code class="bg-white/10 px-1 rounded text-xs font-mono">$1</code>')
+    .replace(/`(.*?)`/g, '<code class="bg-white/10 px-1 rounded text-xs font-mono text-[hsl(210,40%,98%)]">$1</code>')
     .replace(/_(.*?)_/g, "<em>$1</em>")
     .replace(/\n/g, "<br>");
 }
@@ -191,7 +191,7 @@ export default function AsistenteView({ onBack }: AsistenteViewProps) {
               className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                 msg.role === "user"
                   ? "bg-primary text-primary-foreground rounded-tr-sm"
-                  : "bg-[hsl(var(--landing-card))] border border-[hsl(215,25%,22%)] text-foreground rounded-tl-sm"
+                  : "bg-[hsl(var(--landing-card))] border border-[hsl(215,25%,22%)] text-[hsl(210,40%,98%)] rounded-tl-sm"
               }`}
             >
               {msg.role === "bot" ? (
@@ -199,7 +199,7 @@ export default function AsistenteView({ onBack }: AsistenteViewProps) {
               ) : (
                 <span>{msg.text}</span>
               )}
-              <div className={`text-[10px] mt-1.5 ${msg.role === "user" ? "text-primary-foreground/60" : "text-muted-foreground/50"}`}>
+              <div className={`text-[10px] mt-1.5 ${msg.role === "user" ? "text-primary-foreground/70" : "text-[hsl(215,20%,70%)]"}`}>
                 {msg.ts.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })}
               </div>
             </div>
@@ -274,7 +274,7 @@ export default function AsistenteView({ onBack }: AsistenteViewProps) {
                 step === "awaiting_confirm" ? "O escribe tu respuesta..." :
                 "Escribe un mensaje..."
               }
-              className="flex-1 bg-[hsl(215,25%,18%)] border border-[hsl(215,25%,24%)] rounded-xl px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 resize-none focus:outline-none focus:border-primary/60 transition-colors disabled:opacity-50 max-h-[120px] leading-relaxed"
+              className="flex-1 bg-[hsl(215,25%,18%)] border border-[hsl(215,25%,24%)] rounded-xl px-3.5 py-2.5 text-sm text-[hsl(210,40%,98%)] placeholder:text-[hsl(215,20%,62%)] resize-none focus:outline-none focus:border-primary/60 transition-colors disabled:opacity-50 max-h-[120px] leading-relaxed"
               style={{ minHeight: "42px" }}
             />
             <button
