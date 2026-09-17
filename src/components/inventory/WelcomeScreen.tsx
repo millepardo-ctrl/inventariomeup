@@ -36,7 +36,7 @@ const WelcomeScreen = ({ onNavigate }: WelcomeScreenProps) => {
           <img src={meupLogo} alt="MeUp" className="h-7" />
         </div>
         <div className="h-7 w-px bg-secondary" />
-        <span className="text-xs text-muted-foreground uppercase tracking-wider hidden sm:inline">
+        <span className="text-xs text-header-foreground/65 uppercase tracking-wider hidden sm:inline">
           {isBodega ? "Portal Bodega" : "Portal Asesores"}
         </span>
         <div className="flex-1" />
@@ -49,7 +49,7 @@ const WelcomeScreen = ({ onNavigate }: WelcomeScreenProps) => {
         </div>
         <button
           onClick={logout}
-          className="px-3.5 py-1.5 bg-transparent border border-secondary rounded-[9px] text-muted-foreground text-xs font-semibold hover:text-foreground transition-colors"
+          className="px-3.5 py-1.5 bg-transparent border border-secondary rounded-[9px] text-header-foreground/65 text-xs font-semibold hover:text-header-foreground transition-colors"
         >
           Salir
         </button>
@@ -61,15 +61,15 @@ const WelcomeScreen = ({ onNavigate }: WelcomeScreenProps) => {
           <p className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.16em] text-primary/80 mb-2 sm:mb-3">
             {greeting}!
           </p>
-          <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-foreground mb-3">
+          <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-header-foreground mb-3">
             Hola, <span className="text-primary">{user?.nombre || "Asesor"}</span> 👋
           </h1>
-          <p className="text-[13px] sm:text-sm text-muted-foreground leading-relaxed italic px-2">
+          <p className="text-[13px] sm:text-sm text-header-foreground/65 leading-relaxed italic px-2">
             “{phrase}”
           </p>
         </div>
 
-        <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground/50 mb-4">
+        <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-header-foreground/45 mb-4">
           ¿Qué deseas hacer hoy?
         </p>
 
@@ -163,10 +163,10 @@ const TileButton = ({ accent, iconBg, iconBorder, icon, label, description, onCl
     >
       {icon}
     </div>
-    <span className="text-sm font-bold text-foreground tracking-tight leading-tight text-wrap-balance">
+    <span className="text-sm font-bold text-header-foreground tracking-tight leading-tight text-wrap-balance">
       {label}
     </span>
-    <span className="text-[11.5px] text-muted-foreground leading-relaxed mt-auto">
+    <span className="text-[11.5px] text-header-foreground/65 leading-relaxed mt-auto">
       {description}
     </span>
   </button>
