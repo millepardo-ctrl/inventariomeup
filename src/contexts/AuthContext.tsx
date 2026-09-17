@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
 import Papa from "papaparse";
+import { supabase } from "@/integrations/supabase/client";
 
 const USERS_CSV =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ0G2hjB-gsAREX7D1oHD6MyeE9nNTTQyDmKkILivohh6HALF1JIAbKrrWcePNmL3tqKqTO9Cfb8gWd/pub?gid=148554752&single=true&output=csv";
