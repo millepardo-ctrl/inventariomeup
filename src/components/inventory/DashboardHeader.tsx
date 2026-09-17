@@ -41,9 +41,10 @@ const DashboardHeader = ({ user, onLogout, refreshing, lastUpdated, onRefresh, o
         {isVendedor && onGoHome && (
           <button
             onClick={onGoHome}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-[9px] border border-secondary bg-transparent text-muted-foreground text-xs font-semibold hover:text-foreground transition-colors"
+            className="group flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-primary/50 bg-primary/15 text-primary text-xs font-bold uppercase tracking-wider shadow-[0_2px_12px_-4px_hsl(var(--primary)/0.6)] hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-[0_4px_18px_-4px_hsl(var(--primary)/0.8)] transition-all duration-200"
           >
-            ← Portal
+            <span aria-hidden className="transition-transform duration-200 group-hover:-translate-x-0.5">←</span>
+            Portal
           </button>
         )}
 
