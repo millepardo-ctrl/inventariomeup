@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
 import Papa from "papaparse";
+import { supabase } from "@/integrations/supabase/client";
 
 const USERS_CSV =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ0G2hjB-gsAREX7D1oHD6MyeE9nNTTQyDmKkILivohh6HALF1JIAbKrrWcePNmL3tqKqTO9Cfb8gWd/pub?gid=148554752&single=true&output=csv";
@@ -31,8 +32,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = useCallback(async (email: string, password: string): Promise<boolean> => {
     setLoading(true);
     setError(null);
+
+    // 1) Hoja de usuarios (fuente principal)
     try {
-      const res = await fetch(USERS_CSV);
+      const res = await fetch(USERS_CSV, { cache: "no-store" });
       const csv = await res.text();
       const parsed = Papa.parse(csv, { header: true, skipEmptyLines: true });
       const rows = parsed.data as Record<string, string>[];
@@ -43,20 +46,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           (r.password || "").trim() === password.trim()
       );
 
-      if (!match) {
-        setError("Correo o contraseña incorrectos.");
+      if (match) {
+        const rol = ((match.rol || "").trim().toLowerCase() as UserRole) || "distribuidor";
+        setUser({
+          email: (match.email || "").trim().toLowerCase(),
+          nombre: (match.nombre || "").trim(),
+          rol,
+        });
         setLoading(false);
-        return false;
+        return true;
+      }
+    } catch {
+      // si la hoja falla, se intenta con la base de datos
+    }
+
+    // 2) Base de datos de accesos (respaldo)
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke("login", {
+        body: { email: email.trim(), password },
+      });
+
+      const found = (data as { user?: { email: string; nombre: string; rol: string } } | null)?.user;
+      if (!fnError && found) {
+        setUser({
+          email: (found.email || "").trim().toLowerCase(),
+          nombre: (found.nombre || "").trim(),
+          rol: ((found.rol || "").trim().toLowerCase() as UserRole) || "distribuidor",
+        });
+        setLoading(false);
+        return true;
       }
 
-      const rol = ((match.rol || "").trim().toLowerCase() as UserRole) || "distribuidor";
-      setUser({
-        email: (match.email || "").trim().toLowerCase(),
-        nombre: (match.nombre || "").trim(),
-        rol,
-      });
+      setError("Correo o contraseña incorrectos.");
       setLoading(false);
-      return true;
+      return false;
     } catch {
       setError("No se pudo conectar. Intenta de nuevo.");
       setLoading(false);

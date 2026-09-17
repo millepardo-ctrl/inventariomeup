@@ -7,7 +7,7 @@ interface WelcomeScreenProps {
 
 const ASESOR_PHRASES = [
   "Barranquilla y Cúcuta listos para despachar. ¡A cerrar!",
-  "Cada piedra cuenta una historia. Ayuda a tus clientes a encontrar la suya.",
+  "La cima se alcanza construyendo, incluso cuando empezamos colocando la primera piedra.",
   "Hoy es un buen día para cerrar una gran cotización.",
   "Una buena oferta empieza con la referencia exacta.",
   "Tu asesoría convierte materiales en espacios únicos.",
@@ -56,22 +56,24 @@ const WelcomeScreen = ({ onNavigate }: WelcomeScreenProps) => {
       </header>
 
       {/* Main */}
-      <main className="flex-1 flex flex-col items-center justify-center px-5 py-16">
-        <div className="text-center max-w-md mb-12">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary/80 mb-3">
+      <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-5 py-10 sm:py-16">
+        <div className="text-center max-w-md mb-9 sm:mb-12">
+          <p className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.16em] text-primary/80 mb-2 sm:mb-3">
             {greeting}!
           </p>
-          <h1 className="text-4xl font-extrabold tracking-tight text-foreground mb-3">
+          <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-foreground mb-3">
             Hola, <span className="text-primary">{user?.nombre || "Asesor"}</span> 👋
           </h1>
-          <p className="text-sm text-muted-foreground leading-relaxed">{phrase}</p>
+          <p className="text-[13px] sm:text-sm text-muted-foreground leading-relaxed italic px-2">
+            “{phrase}”
+          </p>
         </div>
 
         <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground/50 mb-4">
           ¿Qué deseas hacer hoy?
         </p>
 
-        <div className={`grid grid-cols-2 gap-3 w-full ${isBodega ? "max-w-[420px]" : "max-w-[500px]"}`}>
+        <div className={`grid grid-cols-1 sm:grid-cols-2 gap-3 w-full ${isBodega ? "max-w-[420px]" : "max-w-[500px]"}`}>
           {/* Inventario */}
           <TileButton
             accent="hsl(224,76%,40%)"
@@ -140,7 +142,7 @@ interface TileButtonProps {
 const TileButton = ({ accent, iconBg, iconBorder, icon, label, description, onClick, badge }: TileButtonProps) => (
   <button
     onClick={onClick}
-    className="group relative overflow-hidden bg-[hsl(var(--landing-card))] border border-[hsl(215,25%,24%)] rounded-2xl p-5 flex flex-col gap-2 min-h-[148px] text-left transition-all duration-150 hover:-translate-y-1 hover:shadow-[0_12px_36px_rgba(0,0,0,0.35)] active:translate-y-0"
+    className="group relative overflow-hidden bg-[hsl(var(--landing-card))] border border-[hsl(215,25%,24%)] rounded-2xl p-4 sm:p-5 flex flex-col gap-2 min-h-[110px] sm:min-h-[148px] text-left transition-all duration-150 hover:-translate-y-1 hover:border-[hsl(215,25%,38%)] hover:shadow-[0_12px_36px_rgba(0,0,0,0.35)] active:translate-y-0"
     style={{ "--tile-accent": accent } as React.CSSProperties}
   >
     <div

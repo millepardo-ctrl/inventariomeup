@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_usuarios: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          nombre: string
+          password_hash: string
+          rol: string
+          updated_at: string
+          vendedor: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          nombre: string
+          password_hash: string
+          rol?: string
+          updated_at?: string
+          vendedor?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          nombre?: string
+          password_hash?: string
+          rol?: string
+          updated_at?: string
+          vendedor?: string | null
+        }
+        Relationships: []
+      }
       solicitudes_items: {
         Row: {
           acabado: string | null
@@ -117,7 +150,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      validar_login: {
+        Args: { _email: string; _password: string }
+        Returns: {
+          email: string
+          nombre: string
+          rol: string
+          vendedor: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
