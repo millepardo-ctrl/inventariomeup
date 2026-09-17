@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface AsistenteViewProps {
   onBack: () => void;
+  asesorNombre?: string;
 }
 
 interface Message {
