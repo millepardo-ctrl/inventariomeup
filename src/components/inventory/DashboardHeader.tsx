@@ -1,6 +1,6 @@
 import { AppUser } from "@/data/products";
 import meupLogo from "@/assets/logo-meup.png";
-import { RefreshCw, UserRound, Store } from "lucide-react";
+import { RefreshCw, Store, ArrowLeft } from "lucide-react";
 
 interface DashboardHeaderProps {
   user: AppUser;
