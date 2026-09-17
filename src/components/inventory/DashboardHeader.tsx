@@ -11,6 +11,7 @@ interface DashboardHeaderProps {
   onOpenBodega?: () => void;
   onOpenMuestras?: () => void;
   onOpenOfertas?: () => void;
+  onGoHome?: () => void;
 }
 
 const extractCompany = (email: string) => {
@@ -19,7 +20,7 @@ const extractCompany = (email: string) => {
   return name.charAt(0).toUpperCase() + name.slice(1);
 };
 
-const DashboardHeader = ({ user, onLogout, refreshing, lastUpdated, onRefresh, onOpenBodega, onOpenMuestras, onOpenOfertas }: DashboardHeaderProps) => {
+const DashboardHeader = ({ user, onLogout, refreshing, lastUpdated, onRefresh, onOpenBodega, onOpenMuestras, onOpenOfertas, onGoHome }: DashboardHeaderProps) => {
   const isVendedor = user.type === "vendedor";
   const timeStr = lastUpdated
     ? lastUpdated.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit", hour12: false })
@@ -35,6 +36,16 @@ const DashboardHeader = ({ user, onLogout, refreshing, lastUpdated, onRefresh, o
         <span className="text-xs text-muted-foreground uppercase tracking-wider hidden sm:inline">Inventario en Tiempo Real</span>
 
         <div className="flex-1" />
+
+        {/* Back to hub for vendedor */}
+        {isVendedor && onGoHome && (
+          <button
+            onClick={onGoHome}
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-[9px] border border-secondary bg-transparent text-muted-foreground text-xs font-semibold hover:text-foreground transition-colors"
+          >
+            ← Portal
+          </button>
+        )}
 
         {/* Refresh button */}
         {onRefresh && (

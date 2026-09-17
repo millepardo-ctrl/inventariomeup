@@ -4,7 +4,7 @@ import Papa from "papaparse";
 const USERS_CSV =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ0G2hjB-gsAREX7D1oHD6MyeE9nNTTQyDmKkILivohh6HALF1JIAbKrrWcePNmL3tqKqTO9Cfb8gWd/pub?gid=148554752&single=true&output=csv";
 
-export type UserRole = "admin" | "distribuidor";
+export type UserRole = "admin" | "asesor" | "distribuidor" | "bodega";
 
 export interface AuthUser {
   email: string;
@@ -69,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setError(null);
   }, []);
 
-  const isAdmin = user?.rol === "admin";
+  const isAdmin = user?.rol === "admin" || user?.rol === "asesor";
 
   return (
     <AuthContext.Provider value={{ user, loading, error, login, logout, isAdmin }}>

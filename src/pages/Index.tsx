@@ -4,15 +4,24 @@ import Dashboard from "@/components/inventory/Dashboard";
 import BodegaView from "@/components/bodega/BodegaView";
 import MuestrasPanel from "@/components/muestras/MuestrasPanel";
 import OfertasView from "@/components/ofertas/OfertasView";
+import WelcomeScreen from "@/components/inventory/WelcomeScreen";
+import AsistenteView from "@/components/asistente/AsistenteView";
 import { useGoogleSheetProducts } from "@/hooks/useGoogleSheetProducts";
 import logoMeup from "@/assets/logo-meup.png";
 
-type View = "inventario" | "bodega" | "muestras" | "ofertas";
+type View = "welcome" | "inventario" | "bodega" | "muestras" | "ofertas" | "asistente";
 
 const Index = () => {
   const { user, logout, isAdmin } = useAuth();
   const { products, loading, refreshing, error, lastUpdated, refresh } = useGoogleSheetProducts();
-  const [view, setView] = useState<View>("inventario");
+  const isBodega = user?.rol === "bodega";
+
+  // distributors go straight to inventory; asesor/bodega see the hub first
+  const [view, setView] = useState<View>(
+    user?.rol === "distribuidor" ? "inventario" : "welcome"
+  );
+
+  const goHome = () => setView("welcome");
 
   if (loading) {
     return (
@@ -39,23 +48,36 @@ const Index = () => {
     );
   }
 
+  // Welcome hub (asesor + bodega)
+  if (view === "welcome") {
+    return <WelcomeScreen onNavigate={(v) => setView(v as View)} />;
+  }
+
+  // Bodega view — accessible by admin (from header) and bodega role
+  if (view === "bodega" && (isAdmin || isBodega)) {
+    return <BodegaView onBack={goHome} isAdmin={isAdmin} />;
+  }
+
+  // Muestras — admin and bodega
+  if (view === "muestras" && (isAdmin || isBodega)) {
+    return <MuestrasPanel onBack={goHome} asesorPreset={user!.nombre} />;
+  }
+
+  // Ofertas — admin only
+  if (view === "ofertas" && isAdmin) {
+    return <OfertasView onBack={goHome} />;
+  }
+
+  // Asistente — admin only
+  if (view === "asistente" && isAdmin) {
+    return <AsistenteView onBack={goHome} asesorNombre={user!.nombre} />;
+  }
+
   const appUser = {
     type: isAdmin ? "vendedor" as const : "distribuidor" as const,
     name: user!.nombre,
     email: user!.email,
   };
-
-  if (view === "bodega" && isAdmin) {
-    return <BodegaView onBack={() => setView("inventario")} isAdmin={isAdmin} />;
-  }
-
-  if (view === "muestras" && isAdmin) {
-    return <MuestrasPanel onBack={() => setView("inventario")} asesorPreset={user!.nombre} />;
-  }
-
-  if (view === "ofertas" && isAdmin) {
-    return <OfertasView onBack={() => setView("inventario")} />;
-  }
 
   return (
     <Dashboard
@@ -65,6 +87,7 @@ const Index = () => {
       lastUpdated={lastUpdated}
       onRefresh={refresh}
       onLogout={logout}
+      onGoHome={isAdmin ? goHome : undefined}
       onOpenBodega={isAdmin ? () => setView("bodega") : undefined}
       onOpenMuestras={isAdmin ? () => setView("muestras") : undefined}
       onOpenOfertas={isAdmin ? () => setView("ofertas") : undefined}

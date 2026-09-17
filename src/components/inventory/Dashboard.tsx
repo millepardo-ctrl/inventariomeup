@@ -15,9 +15,10 @@ interface DashboardProps {
   onOpenBodega?: () => void;
   onOpenMuestras?: () => void;
   onOpenOfertas?: () => void;
+  onGoHome?: () => void;
 }
 
-const Dashboard = ({ user, products, onLogout, refreshing, lastUpdated, onRefresh, onOpenBodega, onOpenMuestras, onOpenOfertas }: DashboardProps) => {
+const Dashboard = ({ user, products, onLogout, refreshing, lastUpdated, onRefresh, onOpenBodega, onOpenMuestras, onOpenOfertas, onGoHome }: DashboardProps) => {
   const [search, setSearch] = useState("");
   const [cat, setCat] = useState<"Todos" | Category>("Todos");
   const [filterStock, setFilterStock] = useState(false);
@@ -41,7 +42,7 @@ const Dashboard = ({ user, products, onLogout, refreshing, lastUpdated, onRefres
 
   return (
     <div className="min-h-screen bg-background">
-      <DashboardHeader user={user} onLogout={onLogout} refreshing={refreshing} lastUpdated={lastUpdated} onRefresh={onRefresh} onOpenBodega={onOpenBodega} onOpenMuestras={onOpenMuestras} onOpenOfertas={onOpenOfertas} />
+      <DashboardHeader user={user} onLogout={onLogout} refreshing={refreshing} lastUpdated={lastUpdated} onRefresh={onRefresh} onOpenBodega={onOpenBodega} onOpenMuestras={onOpenMuestras} onOpenOfertas={onOpenOfertas} onGoHome={onGoHome} />
 
       <div className="max-w-[1400px] mx-auto px-5 py-5">
         <KpiBar products={products} isVendedor={isVendedor} />
