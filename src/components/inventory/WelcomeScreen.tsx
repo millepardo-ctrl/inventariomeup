@@ -56,22 +56,24 @@ const WelcomeScreen = ({ onNavigate }: WelcomeScreenProps) => {
       </header>
 
       {/* Main */}
-      <main className="flex-1 flex flex-col items-center justify-center px-5 py-16">
-        <div className="text-center max-w-md mb-12">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary/80 mb-3">
+      <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-5 py-10 sm:py-16">
+        <div className="text-center max-w-md mb-9 sm:mb-12">
+          <p className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.16em] text-primary/80 mb-2 sm:mb-3">
             {greeting}!
           </p>
-          <h1 className="text-4xl font-extrabold tracking-tight text-foreground mb-3">
+          <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-foreground mb-3">
             Hola, <span className="text-primary">{user?.nombre || "Asesor"}</span> 👋
           </h1>
-          <p className="text-sm text-muted-foreground leading-relaxed">{phrase}</p>
+          <p className="text-[13px] sm:text-sm text-muted-foreground leading-relaxed italic px-2">
+            “{phrase}”
+          </p>
         </div>
 
         <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground/50 mb-4">
           ¿Qué deseas hacer hoy?
         </p>
 
-        <div className={`grid grid-cols-2 gap-3 w-full ${isBodega ? "max-w-[420px]" : "max-w-[500px]"}`}>
+        <div className={`grid grid-cols-1 sm:grid-cols-2 gap-3 w-full ${isBodega ? "max-w-[420px]" : "max-w-[500px]"}`}>
           {/* Inventario */}
           <TileButton
             accent="hsl(224,76%,40%)"
