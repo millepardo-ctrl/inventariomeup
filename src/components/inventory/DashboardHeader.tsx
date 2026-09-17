@@ -1,6 +1,6 @@
 import { AppUser } from "@/data/products";
 import meupLogo from "@/assets/logo-meup.png";
-import { RefreshCw, UserRound, Store } from "lucide-react";
+import { RefreshCw, Store, ArrowLeft } from "lucide-react";
 
 interface DashboardHeaderProps {
   user: AppUser;
@@ -37,16 +37,6 @@ const DashboardHeader = ({ user, onLogout, refreshing, lastUpdated, onRefresh, o
 
         <div className="flex-1" />
 
-        {/* Back to hub for vendedor */}
-        {isVendedor && onGoHome && (
-          <button
-            onClick={onGoHome}
-            className="group flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-primary/50 bg-primary/15 text-primary text-xs font-bold uppercase tracking-wider shadow-[0_2px_12px_-4px_hsl(var(--primary)/0.6)] hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-[0_4px_18px_-4px_hsl(var(--primary)/0.8)] transition-all duration-200"
-          >
-            <span aria-hidden className="transition-transform duration-200 group-hover:-translate-x-0.5">←</span>
-            Portal
-          </button>
-        )}
 
         {/* Refresh button */}
         {onRefresh && (
@@ -89,23 +79,22 @@ const DashboardHeader = ({ user, onLogout, refreshing, lastUpdated, onRefresh, o
             👋 Hola, <span className="capitalize">{extractCompany(user.email)}</span>
           </span>
         )}
-        <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider border ${
-          isVendedor
-            ? "bg-[hsl(213,50%,25%)] text-primary border-primary/25"
-            : "bg-[hsl(24,10%,11%)] text-[hsl(30,5%,64%)] border-[hsl(20,6%,26%)]"
-        }`}>
-          {isVendedor ? (
-            <>
-              <UserRound className="w-3.5 h-3.5" strokeWidth={2.5} />
-              {user.name}
-            </>
-          ) : (
-            <>
-              <Store className="w-3.5 h-3.5" strokeWidth={2.5} />
-              {extractCompany(user.email)}
-            </>
-          )}
-        </div>
+        {isVendedor ? (
+          onGoHome && (
+            <button
+              onClick={onGoHome}
+              className="group flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-primary/50 bg-primary/15 text-primary text-xs font-bold uppercase tracking-wider shadow-[0_2px_12px_-4px_hsl(var(--primary)/0.6)] hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-[0_4px_18px_-4px_hsl(var(--primary)/0.8)] transition-all duration-200"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 transition-transform duration-200 group-hover:-translate-x-0.5" />
+              Portal
+            </button>
+          )
+        ) : (
+          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider border bg-[hsl(24,10%,11%)] text-[hsl(30,5%,64%)] border-[hsl(20,6%,26%)]">
+            <Store className="w-3.5 h-3.5" strokeWidth={2.5} />
+            {extractCompany(user.email)}
+          </div>
+        )}
 
         {/* Logout for distributors */}
         {!isVendedor && (
