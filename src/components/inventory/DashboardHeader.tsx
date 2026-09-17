@@ -72,25 +72,6 @@ const DashboardHeader = ({ user, onLogout, refreshing, lastUpdated, onRefresh, o
           </a>
         )}
 
-        {/* Ofertas (admin only) */}
-        {isVendedor && onOpenOfertas && (
-          <button
-            onClick={onOpenOfertas}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[hsl(280,60%,18%)] border border-[hsl(280,60%,35%)] rounded-[9px] text-[hsl(280,80%,78%)] text-xs font-semibold hover:opacity-90 transition-opacity uppercase tracking-wider"
-          >
-            💼 Ofertas
-          </button>
-        )}
-
-        {/* Muestras (admin only) */}
-        {isVendedor && onOpenMuestras && (
-          <button
-            onClick={onOpenMuestras}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[hsl(220,70%,18%)] border border-[hsl(220,70%,35%)] rounded-[9px] text-[hsl(220,85%,75%)] text-xs font-semibold hover:opacity-90 transition-opacity uppercase tracking-wider"
-          >
-            📦 Muestras
-          </button>
-        )}
 
         {/* Bodega view (admin only) */}
         {isVendedor && onOpenBodega && (
