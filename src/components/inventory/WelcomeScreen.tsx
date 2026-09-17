@@ -1,6 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import meupLogo from "@/assets/logo-meup.png";
-import { Boxes, Palette, Zap, MessageSquare, LogOut, Sparkles, type LucideIcon } from "lucide-react";
+import { LogOut, Sparkles } from "lucide-react";
 
 interface WelcomeScreenProps {
   onNavigate: (view: string) => void;
