@@ -76,7 +76,7 @@ const MuestrasPanel = ({ onBack, asesorPreset }: Props) => {
               current={tab}
               onClick={setTab}
               icon={<Warehouse className="w-3.5 h-3.5" />}
-              label="Bodega"
+              label="Pedidos Bodega"
               badge={pendientes}
             />
             <TabBtn
