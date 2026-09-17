@@ -137,7 +137,7 @@ interface TileButtonProps {
   badge?: string;
 }
 
-const TileButton = ({ accent, Icon, label, description, onClick, badge }: TileButtonProps) => (
+const TileButton = ({ accent, emoji, label, description, onClick, badge }: TileButtonProps) => (
   <button
     onClick={onClick}
     style={{ ["--tile" as string]: accent }}
