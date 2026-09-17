@@ -273,6 +273,9 @@ Devuelve SOLO un JSON con este formato exacto:
 
 Reglas:
 - Si la cantidad no se especifica, asume 1.
+- Si hay varias opciones de tamaño o acabado para el mismo producto, elige UNA SOLA (la primera del catálogo) y NO incluyas las demás variantes.
+- Si hay ambigüedad real entre productos distintos (no entre tamaños del mismo), elige el más probable y anótalo en "nota".
+- "nota" SOLO para problemas reales: producto no encontrado, código no disponible. NO usar para unidades, cantidades ni conversiones.
 - valor_tonelada: extrae si el asesor escribe "tonelada 300.000" o "valor tonelada $300 mil". "300 mil"=300000. Si no se menciona, null.
 - NO incluir valor_tonelada como producto.
 - Si un producto no tiene código, usa "SIN_CODIGO".`;
@@ -385,6 +388,15 @@ Deno.serve(async (req) => {
         headers: { "Content-Type": "application/json", "Token": `Bearer ${N8N_TOKEN}` },
         body: JSON.stringify(payload),
       });
+
+      if (!n8nRes.ok) {
+        const errBody = await n8nRes.text().catch(() => "");
+        console.error("n8n error status:", n8nRes.status, errBody);
+        return json({
+          reply: `❌ Symphony respondió con error ${n8nRes.status}. Verifica el workflow de n8n. Escribe /cancelar para reiniciar.`,
+          step: "awaiting_confirm",
+        });
+      }
 
       const n8nData = await n8nRes.json().catch(() => ({}));
       await resetSession(sid);
