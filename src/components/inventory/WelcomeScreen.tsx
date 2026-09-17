@@ -156,8 +156,8 @@ const TileButton = ({ accent, emoji, label, description, onClick, badge }: TileB
       </span>
     )}
 
-    <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[hsl(var(--tile)/0.14)] border border-[hsl(var(--tile)/0.35)] text-[hsl(var(--tile))] group-hover:scale-105 transition-transform">
-      <Icon className="w-5 h-5" strokeWidth={2.2} />
+    <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[hsl(var(--tile)/0.14)] border border-[hsl(var(--tile)/0.35)] text-[22px] leading-none group-hover:scale-110 transition-transform">
+      <span aria-hidden>{emoji}</span>
     </div>
 
     <span className="text-[15px] font-bold text-header-foreground tracking-tight leading-tight">{label}</span>
