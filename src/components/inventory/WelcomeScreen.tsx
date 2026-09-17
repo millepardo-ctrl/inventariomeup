@@ -130,7 +130,7 @@ const WelcomeScreen = ({ onNavigate }: WelcomeScreenProps) => {
 
 interface TileButtonProps {
   accent: string;
-  Icon: LucideIcon;
+  emoji: string;
   label: string;
   description: string;
   onClick: () => void;
