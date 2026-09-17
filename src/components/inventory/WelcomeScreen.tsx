@@ -1,6 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import meupLogo from "@/assets/logo-meup.png";
-import { Boxes, Palette, Zap, MessageSquare, LogOut, Sparkles, type LucideIcon } from "lucide-react";
+import { LogOut, Sparkles } from "lucide-react";
 
 interface WelcomeScreenProps {
   onNavigate: (view: string) => void;
@@ -81,14 +81,14 @@ const WelcomeScreen = ({ onNavigate }: WelcomeScreenProps) => {
           </p>
         </div>
 
-        <p className="text-[10.5px] font-bold uppercase tracking-[0.18em] text-header-foreground/45 mb-5">
+        <p className="text-[10.5px] font-bold uppercase tracking-[0.18em] text-header-foreground mb-5">
           ¿Qué deseas hacer hoy?
         </p>
 
         <div className={`grid grid-cols-1 sm:grid-cols-2 gap-3.5 w-full ${isBodega ? "max-w-[440px]" : "max-w-[560px]"}`}>
           <TileButton
             accent="213 95% 62%"
-            Icon={Boxes}
+            emoji={isBodega ? "🏭" : "🔍"}
             label={isBodega ? "Vista Bodega" : "Consultar inventario"}
             description={isBodega ? "Pedidos, despachos y control de stock" : "Disponibilidad en BAQ · CUC · En tránsito"}
             onClick={() => onNavigate(isBodega ? "bodega" : "inventario")}
@@ -96,7 +96,7 @@ const WelcomeScreen = ({ onNavigate }: WelcomeScreenProps) => {
 
           <TileButton
             accent="160 70% 52%"
-            Icon={Palette}
+            emoji="📦"
             label="Solicitar muestra"
             description="Pide muestras por referencia al almacén"
             onClick={() => onNavigate("muestras")}
@@ -105,7 +105,7 @@ const WelcomeScreen = ({ onNavigate }: WelcomeScreenProps) => {
           {!isBodega && (
             <TileButton
               accent="280 75% 68%"
-              Icon={Zap}
+              emoji="⚡"
               label="Motor de Oferta"
               description="Calcula precios, márgenes y descuentos"
               onClick={() => onNavigate("ofertas")}
@@ -115,7 +115,7 @@ const WelcomeScreen = ({ onNavigate }: WelcomeScreenProps) => {
           {!isBodega && (
             <TileButton
               accent="32 92% 62%"
-              Icon={MessageSquare}
+              emoji="💬"
               label="Asistente oferta"
               description="Cotiza por chat con IA · Sube el RUT y listo"
               onClick={() => onNavigate("asistente")}
@@ -130,14 +130,14 @@ const WelcomeScreen = ({ onNavigate }: WelcomeScreenProps) => {
 
 interface TileButtonProps {
   accent: string;
-  Icon: LucideIcon;
+  emoji: string;
   label: string;
   description: string;
   onClick: () => void;
   badge?: string;
 }
 
-const TileButton = ({ accent, Icon, label, description, onClick, badge }: TileButtonProps) => (
+const TileButton = ({ accent, emoji, label, description, onClick, badge }: TileButtonProps) => (
   <button
     onClick={onClick}
     style={{ ["--tile" as string]: accent }}
@@ -156,8 +156,8 @@ const TileButton = ({ accent, Icon, label, description, onClick, badge }: TileBu
       </span>
     )}
 
-    <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[hsl(var(--tile)/0.14)] border border-[hsl(var(--tile)/0.35)] text-[hsl(var(--tile))] group-hover:scale-105 transition-transform">
-      <Icon className="w-5 h-5" strokeWidth={2.2} />
+    <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[hsl(var(--tile)/0.14)] border border-[hsl(var(--tile)/0.35)] text-[22px] leading-none group-hover:scale-110 transition-transform">
+      <span aria-hidden>{emoji}</span>
     </div>
 
     <span className="text-[15px] font-bold text-header-foreground tracking-tight leading-tight">{label}</span>
