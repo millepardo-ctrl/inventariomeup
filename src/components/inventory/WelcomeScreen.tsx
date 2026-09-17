@@ -7,7 +7,7 @@ interface WelcomeScreenProps {
 
 const ASESOR_PHRASES = [
   "Barranquilla y Cúcuta listos para despachar. ¡A cerrar!",
-  "Cada piedra cuenta una historia. Ayuda a tus clientes a encontrar la suya.",
+  "La cima se alcanza construyendo, incluso cuando empezamos colocando la primera piedra.",
   "Hoy es un buen día para cerrar una gran cotización.",
   "Una buena oferta empieza con la referencia exacta.",
   "Tu asesoría convierte materiales en espacios únicos.",
