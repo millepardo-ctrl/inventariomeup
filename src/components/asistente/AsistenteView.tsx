@@ -2,7 +2,6 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { ArrowLeft, Send, Paperclip, X, RotateCcw } from "lucide-react";
 import meupLogo from "@/assets/logo-meup.png";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 
 interface AsistenteViewProps {
   onBack: () => void;
@@ -69,11 +68,19 @@ export default function AsistenteView({ onBack }: AsistenteViewProps) {
     setPendingPdf(null);
 
     try {
-      const { data, error } = await supabase.functions.invoke("web-cotizador", {
-        body: { session_id: sessionId, message: text, pdf_base64: pdfBase64 },
-      });
-
-      if (error) throw error;
+      const res = await fetch(
+        "https://mqgzsskdvdgvqjswxovm.supabase.co/functions/v1/web-cotizador",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xZ3pzc2tkdmRndnFqc3d4b3ZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0MDQ0NzAsImV4cCI6MjEwMjk4MDQ3MH0.0Q5Mg2GI6LYa6HZsQKuTCPL6_BZ4-AZ-y0XRCG0yYEk",
+          },
+          body: JSON.stringify({ session_id: sessionId, message: text, pdf_base64: pdfBase64 }),
+        }
+      );
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
 
       addMessage({ role: "bot", text: data.reply });
       setStep((data.step as Step) ?? "idle");
