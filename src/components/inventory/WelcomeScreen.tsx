@@ -142,7 +142,7 @@ interface TileButtonProps {
 const TileButton = ({ accent, iconBg, iconBorder, icon, label, description, onClick, badge }: TileButtonProps) => (
   <button
     onClick={onClick}
-    className="group relative overflow-hidden bg-[hsl(var(--landing-card))] border border-[hsl(215,25%,24%)] rounded-2xl p-5 flex flex-col gap-2 min-h-[148px] text-left transition-all duration-150 hover:-translate-y-1 hover:shadow-[0_12px_36px_rgba(0,0,0,0.35)] active:translate-y-0"
+    className="group relative overflow-hidden bg-[hsl(var(--landing-card))] border border-[hsl(215,25%,24%)] rounded-2xl p-4 sm:p-5 flex flex-col gap-2 min-h-[110px] sm:min-h-[148px] text-left transition-all duration-150 hover:-translate-y-1 hover:border-[hsl(215,25%,38%)] hover:shadow-[0_12px_36px_rgba(0,0,0,0.35)] active:translate-y-0"
     style={{ "--tile-accent": accent } as React.CSSProperties}
   >
     <div
