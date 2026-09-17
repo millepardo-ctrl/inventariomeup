@@ -92,10 +92,10 @@ const MuestrasPanel = ({ onBack, asesorPreset }: Props) => {
 
           <button
             onClick={onBack}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-[9px] border border-border bg-card text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
+            className="group flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-primary/50 bg-primary/15 text-primary text-xs font-bold uppercase tracking-wider shadow-[0_2px_12px_-4px_hsl(var(--primary)/0.6)] hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-[0_4px_18px_-4px_hsl(var(--primary)/0.8)] transition-all duration-200"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Inventario</span>
+            <ArrowLeft className="w-3.5 h-3.5 transition-transform duration-200 group-hover:-translate-x-0.5" />
+            <span className="hidden sm:inline">Portal</span>
           </button>
         </div>
       </header>
