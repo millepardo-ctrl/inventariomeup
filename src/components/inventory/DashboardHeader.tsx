@@ -94,7 +94,7 @@ const DashboardHeader = ({ user, onLogout, refreshing, lastUpdated, onRefresh, o
             ? "bg-[hsl(213,50%,25%)] text-primary border-primary/25"
             : "bg-[hsl(24,10%,11%)] text-[hsl(30,5%,64%)] border-[hsl(20,6%,26%)]"
         }`}>
-          {isVendedor ? "👤 Vendedor" : `🏪 ${extractCompany(user.email)}`}
+          {isVendedor ? `👤 ${user.name}` : `🏪 ${extractCompany(user.email)}`}
         </div>
 
         {/* Logout for distributors */}
