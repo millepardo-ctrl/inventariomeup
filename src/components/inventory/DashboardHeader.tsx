@@ -37,16 +37,6 @@ const DashboardHeader = ({ user, onLogout, refreshing, lastUpdated, onRefresh, o
 
         <div className="flex-1" />
 
-        {/* Back to hub for vendedor */}
-        {isVendedor && onGoHome && (
-          <button
-            onClick={onGoHome}
-            className="group flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-primary/50 bg-primary/15 text-primary text-xs font-bold uppercase tracking-wider shadow-[0_2px_12px_-4px_hsl(var(--primary)/0.6)] hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-[0_4px_18px_-4px_hsl(var(--primary)/0.8)] transition-all duration-200"
-          >
-            <span aria-hidden className="transition-transform duration-200 group-hover:-translate-x-0.5">←</span>
-            Portal
-          </button>
-        )}
 
         {/* Refresh button */}
         {onRefresh && (
