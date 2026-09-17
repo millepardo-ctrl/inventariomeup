@@ -1,6 +1,6 @@
 import { AppUser } from "@/data/products";
 import meupLogo from "@/assets/logo-meup.png";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, UserRound, Store } from "lucide-react";
 
 interface DashboardHeaderProps {
   user: AppUser;
@@ -89,12 +89,22 @@ const DashboardHeader = ({ user, onLogout, refreshing, lastUpdated, onRefresh, o
             👋 Hola, <span className="capitalize">{extractCompany(user.email)}</span>
           </span>
         )}
-        <div className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider border ${
+        <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider border ${
           isVendedor
             ? "bg-[hsl(213,50%,25%)] text-primary border-primary/25"
             : "bg-[hsl(24,10%,11%)] text-[hsl(30,5%,64%)] border-[hsl(20,6%,26%)]"
         }`}>
-          {isVendedor ? `👤 ${user.name}` : `🏪 ${extractCompany(user.email)}`}
+          {isVendedor ? (
+            <>
+              <UserRound className="w-3.5 h-3.5" strokeWidth={2.5} />
+              {user.name}
+            </>
+          ) : (
+            <>
+              <Store className="w-3.5 h-3.5" strokeWidth={2.5} />
+              {extractCompany(user.email)}
+            </>
+          )}
         </div>
 
         {/* Logout for distributors */}
