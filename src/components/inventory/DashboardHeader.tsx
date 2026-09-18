@@ -33,7 +33,7 @@ const DashboardHeader = ({ user, onLogout, refreshing, lastUpdated, onRefresh, o
           <img src={meupLogo} alt="MeUp" className="h-7" />
         </div>
         <div className="h-7 w-px bg-secondary" />
-        <span className="text-xs text-muted-foreground uppercase tracking-wider hidden sm:inline">Inventario en Tiempo Real</span>
+        <span className="text-xs text-header-foreground/60 uppercase tracking-wider hidden sm:inline">Inventario en Tiempo Real</span>
 
         <div className="flex-1" />
 
@@ -43,7 +43,7 @@ const DashboardHeader = ({ user, onLogout, refreshing, lastUpdated, onRefresh, o
           <button
             onClick={onRefresh}
             disabled={refreshing}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-[9px] border border-border bg-card text-xs text-muted-foreground font-medium hover:text-foreground transition-colors disabled:opacity-50"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-[9px] border border-header-foreground/20 bg-header-foreground/10 text-xs text-header-foreground/80 font-medium hover:text-header-foreground transition-colors disabled:opacity-50"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`} />
             {refreshing ? "Actualizando..." : timeStr ? `Actualizado ${timeStr}` : "Actualizar"}
@@ -75,7 +75,7 @@ const DashboardHeader = ({ user, onLogout, refreshing, lastUpdated, onRefresh, o
 
         {/* Greeting + Role badge */}
         {!isVendedor && (
-          <span className="text-sm text-foreground font-semibold hidden sm:inline">
+          <span className="text-sm text-header-foreground font-semibold hidden sm:inline">
             👋 Hola, <span className="capitalize">{extractCompany(user.email)}</span>
           </span>
         )}
