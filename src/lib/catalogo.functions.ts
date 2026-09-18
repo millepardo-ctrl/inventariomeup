@@ -86,16 +86,16 @@ export type AsesorRow = {
   asesor_email: string;
 };
 
-export const leerMotorData = () =>
+export const leerMotorData = (_arg?: unknown) =>
   invocar<MotorData>("ofertas-catalogo", { action: "motorData" });
 
-export const refrescarMotorData = () =>
+export const refrescarMotorData = (_arg?: unknown) =>
   invocar<MotorData>("ofertas-catalogo", { action: "refrescar" });
 
-export const leerAsesores = () =>
+export const leerAsesores = (_arg?: unknown) =>
   invocar<AsesorRow[]>("ofertas-catalogo", { action: "asesores" });
 
-export const leerContenido = () =>
+export const leerContenido = (_arg?: unknown) =>
   invocar<ContenidoRow[]>("ofertas-catalogo", { action: "contenido" });
 
 export const calcularPrecioCOP = (arg: {
