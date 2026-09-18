@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import Dashboard from "@/components/inventory/Dashboard";
 import BodegaView from "@/components/bodega/BodegaView";
 import MuestrasPanel from "@/components/muestras/MuestrasPanel";
-import MotorOfertasEmbed from "@/components/ofertas/MotorOfertasEmbed";
+import MotorOfertasView from "@/components/ofertas/MotorOfertasView";
 import WelcomeScreen from "@/components/inventory/WelcomeScreen";
 import AsistenteView from "@/components/asistente/AsistenteView";
 import { useGoogleSheetProducts } from "@/hooks/useGoogleSheetProducts";
@@ -65,7 +65,7 @@ const Index = () => {
 
   // Ofertas — admin only
   if (view === "ofertas" && isAdmin) {
-    return <MotorOfertasEmbed onBack={goHome} />;
+    return <MotorOfertasView onBack={goHome} />;
   }
 
   // Asistente — admin only
