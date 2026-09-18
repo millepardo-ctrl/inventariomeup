@@ -119,7 +119,7 @@ const CATALOG = [
 const SHEET_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRZcZ_HAFNOdIAXh8AvNqeiBM3fjfBLHUPYxz5u_WYPnwi_nKZ8N3lzpAnSLYRb6HNp46DHG0Z48mjZ/pub?gid=1640636152&single=true&output=csv";
 
 const ANTHROPIC = Deno.env.get("ANTHROPIC_API_KEY")!;
-const N8N_URL = Deno.env.get("N8N_WEBHOOK_COTIZACION")!;
+const N8N_URL = "https://meup.co/webhook/cotizacion-telegram";
 const N8N_TOKEN = Deno.env.get("N8N_WEBHOOK_TOKEN")!;
 
 const supabase = createClient(
