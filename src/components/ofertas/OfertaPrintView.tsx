@@ -1,12 +1,7 @@
 import { useEffect, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
-import { PlantillaCorta } from "../components/PlantillaCorta";
-import "../styles/oferta.css";
-import { useAppState } from "../lib/store";
-
-export const Route = createFileRoute("/print")({
-  component: PrintPage,
-});
+import { PlantillaCorta } from "@/components/ofertas/PlantillaCorta";
+import "@/styles/oferta.css";
+import { useAppState } from "@/lib/ofertasStore";
 
 const btn = (bg: string) => ({
   padding: "8px 16px",

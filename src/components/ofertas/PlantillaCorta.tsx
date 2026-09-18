@@ -1,4 +1,4 @@
-import logoMeUp from "@/assets/logo-meup.png.asset.json";
+import logoMeUp from "@/assets/logo-meup.png";
 
 const fmt = (n: number) =>
   n?.toLocaleString("es-CO", { style: "currency", currency: "COP", minimumFractionDigits: 2 }) ?? "";
@@ -12,7 +12,7 @@ export function PlantillaCorta({ oferta }: { oferta: any }) {
       {/* HEADER */}
       <div className="header-grid">
         <div className="header-logo">
-          <img src={logoMeUp.url} alt="MeUp" className="logo-img" />
+          <img src={logoMeUp} alt="MeUp" className="logo-img" />
           <div className="asesor-info">
             <p><strong>Asesor:</strong> {asesor?.nombre}</p>
             <p><strong>Email:</strong> {asesor?.email}</p>
@@ -139,7 +139,7 @@ export function PlantillaCorta({ oferta }: { oferta: any }) {
 
       {/* FOOTER */}
       <div className="footer">
-        <img src={logoMeUp.url} alt="MeUp" className="logo-footer" />
+        <img src={logoMeUp} alt="MeUp" className="logo-footer" />
         <p className="claim">El toque natural para tus proyectos</p>
       </div>
     </div>

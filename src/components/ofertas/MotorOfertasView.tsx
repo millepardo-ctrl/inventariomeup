@@ -1,25 +1,49 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft, RefreshCw } from "lucide-react";
+import { useServerFn } from "@/lib/ofertasApi";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import logo from "@/assets/meup-logo.png";
+import logo from "@/assets/logo-meup.png";
 import { calcularConMotor } from "@/lib/motor.functions";
 import { guardarOfertaEnSheet } from "@/lib/oferta.functions";
 import { enviarOfertaLarga, guardarOfertaRegistro } from "@/lib/oferta-larga.functions";
 import { buscarFotosProductos } from "@/lib/fotos.functions";
 
 import { leerMotorData, refrescarMotorData, calcularPrecioCOP, leerAsesores, type AsesorRow } from "@/lib/catalogo.functions";
-import { store, useAppState } from "@/lib/store";
+import { store, useAppState } from "@/lib/ofertasStore";
 
-export const Route = createFileRoute("/")({
-  component: Dashboard,
-  head: () => ({
-    meta: [
-      { title: "MeUp · Motor de Ofertas" },
-      { name: "description", content: "Genera ofertas comerciales rápidas y precisas con MeUp." },
-    ],
-  }),
-});
+interface MotorOfertasViewProps {
+  onBack?: () => void;
+}
+
+export default function MotorOfertasView({ onBack }: MotorOfertasViewProps) {
+  return (
+    <div className="min-h-screen bg-background">
+      <header className="bg-header sticky top-0 z-50 shadow-[0_1px_0_rgba(255,255,255,0.06)]">
+        <div className="max-w-[1400px] mx-auto flex items-center gap-3 px-4 sm:px-5 h-[58px]">
+          <div className="bg-card rounded-lg px-2.5 py-1 flex items-center">
+            <img src={logo} alt="MeUp" className="h-7" />
+          </div>
+          <div className="h-7 w-px bg-header-foreground/15" />
+          <span className="text-xs text-header-foreground/60 uppercase tracking-wider hidden sm:inline">
+            Motor de Oferta
+          </span>
+          <div className="flex-1" />
+          {onBack && (
+            <button
+              onClick={onBack}
+              className="group flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-primary/50 bg-primary/15 text-primary text-xs font-bold uppercase tracking-wider shadow-[0_2px_12px_-4px_hsl(var(--primary)/0.6)] hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-200"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 transition-transform duration-200 group-hover:-translate-x-0.5" />
+              Portal
+            </button>
+          )}
+        </div>
+      </header>
+      <Dashboard />
+    </div>
+  );
+}
 
 type TipoOfertaMargen = "Mejor oferta" | "Primera versión" | "Oferta de presupuesto";
 
@@ -565,7 +589,7 @@ function Dashboard() {
     } catch {}
     setUltimaGenerada({ payload: ofertaFinal, tipo: "corta" });
     setOfertaGuardada(false);
-    navigate({ to: "/print" });
+    navigate("/oferta/imprimir");
   };
 
 
