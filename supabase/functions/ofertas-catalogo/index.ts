@@ -1,43 +1,36 @@
-import { createServerFn } from "@tanstack/react-start";
+import { corsHeaders, getGoogleAccessToken, jsonResponse } from "../_shared/google.ts";
 
 const SPREADSHEET_ID = "10lBx3kvJOw_vwi8vWM8E59rxMzMgpSCQXUcSn0UtodM";
-const GATEWAY_URL = "https://connector-gateway.lovable.dev/google_sheets/v4";
+const SHEETS_SCOPE = "https://www.googleapis.com/auth/spreadsheets";
 
 async function gatewayFetch(path: string, init: RequestInit = {}) {
-  const lovableKey = process.env.LOVABLE_API_KEY;
-  const sheetsKey = process.env.GOOGLE_SHEETS_API_KEY;
-  if (!lovableKey) throw new Error("LOVABLE_API_KEY no está configurado.");
-  if (!sheetsKey) throw new Error("GOOGLE_SHEETS_API_KEY no está configurado. Conecta Google Sheets.");
-
   const MAX_ATTEMPTS = 4;
   let lastErr = "";
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
     if (attempt > 0) {
-      // backoff exponencial con jitter: ~400ms, 800ms, 1600ms
       const wait = 400 * 2 ** (attempt - 1) + Math.random() * 200;
       await new Promise((r) => setTimeout(r, wait));
     }
     let res: Response;
     try {
-      res = await fetch(`${GATEWAY_URL}${path}`, {
+      const token = await getGoogleAccessToken(SHEETS_SCOPE);
+      res = await fetch(`https://sheets.googleapis.com/v4${path}`, {
         ...init,
         headers: {
-          Authorization: `Bearer ${lovableKey}`,
-          "X-Connection-Api-Key": sheetsKey,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
           ...(init.headers ?? {}),
         },
       });
     } catch (e) {
       lastErr = `network error: ${String(e)}`;
-      continue; // reintentar fallos de red
+      continue;
     }
     const text = await res.text();
     if (res.ok) {
       try { return text ? JSON.parse(text) : {}; } catch { return {}; }
     }
-    lastErr = `Google Sheets gateway ${res.status}: ${text}`;
-    // Reintentar solo errores transitorios (429 / 5xx). 4xx restantes fallan ya.
+    lastErr = `Google Sheets ${res.status}: ${text}`;
     if (res.status !== 429 && res.status < 500) throw new Error(lastErr);
   }
   throw new Error(lastErr);
@@ -83,7 +76,7 @@ const num = (v: unknown) => {
 
 // ─── TYPES ───────────────────────────────────────────────────────────────────
 
-export type CotizacionRow = {
+type CotizacionRow = {
   tipo_producto: string;
   nombre_comercial: string;
   espesor_mm: string;
@@ -96,13 +89,13 @@ export type CotizacionRow = {
   fecha: string;  // Col L — YYYY-MM-DD como string
 };
 
-export type TraduccionRow = {
+type TraduccionRow = {
   nombre_comercial: string; // UniversalName (clave de join)
   nombre_universal: string; // Nombre MeUp comercial (display)
   alias: string;
 };
 
-export type DemoPrecioRow = {
+type DemoPrecioRow = {
   nombre_comercial: string; // Nombre MeUp
   tipo_producto: string;
   espesor_mm: string;
@@ -116,9 +109,9 @@ export type DemoPrecioRow = {
   advertencia: string;
 };
 
-export type AlertaRow = { condicion: string; mensaje: string };
+type AlertaRow = { condicion: string; mensaje: string };
 
-export type ContenidoRow = {
+type ContenidoRow = {
   nombre_meup: string;
   descripcion_1: string;
   descripcion_2: string;
@@ -133,7 +126,7 @@ export type ContenidoRow = {
   adhesivo: string;
 };
 
-export type PrecioResult = {
+type PrecioResult = {
   fobUSD: number;
   fobEstado: "vigente" | "extrapolado";
   costoCOP: number;
@@ -378,12 +371,12 @@ async function _contenido(): Promise<ContenidoRow[]> {
 
 // ─── MOTOR DE PRECIOS (habilidad meup-motor-precios) ─────────────────────────
 
-export const calcularPrecioCOP = createServerFn({ method: "POST" })
-  .inputValidator((i: unknown) => i as {
-    nombreMeUp: string; espesor: string; acabado: string;
-    formato: string; tipoOferta: string; anchoM?: number;
-  })
-  .handler(async ({ data }): Promise<PrecioResult> => {
+type PrecioInput = {
+  nombreMeUp: string; espesor: string; acabado: string;
+  formato: string; tipoOferta: string; anchoM?: number;
+};
+
+async function _calcularPrecioCOP(data: PrecioInput): Promise<PrecioResult> {
     const ERR = (msg: string): PrecioResult => ({
       fobUSD: 0, fobEstado: "extrapolado", costoCOP: 0, pvpSinIVA: 0, pvpConIVA: 0,
       margenAplicado: 0, margenEfectivo: 0, origen: "", fleteUSD: 0, navieraUSD: 0,
@@ -497,18 +490,12 @@ export const calcularPrecioCOP = createServerFn({ method: "POST" })
       precioML,
       advertencia:     "",
     };
-  });
+}
 
 // ─── EXPORTS ─────────────────────────────────────────────────────────────────
 
-export const leerParams       = createServerFn({ method: "GET" }).handler(_params);
-export const leerCotizaciones = createServerFn({ method: "GET" }).handler(_cotizaciones);
-export const leerTraducciones = createServerFn({ method: "GET" }).handler(_traducciones);
-export const leerDemoPreciosCO = createServerFn({ method: "GET" }).handler(_demoPrecios);
-export const leerAlertas      = createServerFn({ method: "GET" }).handler(_alertas);
-export const leerContenido    = createServerFn({ method: "GET" }).handler(_contenido);
 
-export type MotorData = {
+type MotorData = {
   params:       Record<string, string>;
   cotizaciones: CotizacionRow[];
   traducciones: TraduccionRow[];
@@ -517,7 +504,7 @@ export type MotorData = {
   contenido:    ContenidoRow[];
 };
 
-export type Catalogo = MotorData;
+type Catalogo = MotorData;
 
 // Caché en memoria del servidor — evita rate limiting de Google Sheets
 let _motorCache: MotorData | null = null;
@@ -557,24 +544,20 @@ async function _getMotorData(): Promise<MotorData> {
 }
 
 
-export const leerMotorData = createServerFn({ method: "GET" }).handler(
-  async (): Promise<MotorData> => _getMotorData()
-);
+
 
 // Fuerza relectura de Google Sheets (invalida el caché en memoria)
-export const refrescarMotorData = createServerFn({ method: "POST" }).handler(
-  async (): Promise<MotorData> => {
-    _motorCache = null;
-    _motorCacheTime = 0;
-    _asesoresCache = null;
-    _asesoresCacheTime = 0;
-    return _getMotorData();
-  }
-);
+async function _refrescarMotorData(): Promise<MotorData> {
+  _motorCache = null;
+  _motorCacheTime = 0;
+  _asesoresCache = null;
+  _asesoresCacheTime = 0;
+  return _getMotorData();
+}
 
 // ─── ASESORES ────────────────────────────────────────────────────────────────
 
-export type AsesorRow = {
+type AsesorRow = {
   asesor_nombre: string;
   asesor_cargo: string;
   asesor_cel: string;
@@ -621,5 +604,31 @@ async function _asesores(): Promise<AsesorRow[]> {
   }
 }
 
-export const leerAsesores = createServerFn({ method: "GET" }).handler(_asesores);
 
+
+
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  try {
+    const body = req.method === "POST" ? await req.json().catch(() => ({})) : {};
+    const action = String(body?.action ?? "motorData");
+    switch (action) {
+      case "motorData":
+        return jsonResponse(await _getMotorData());
+      case "refrescar":
+        return jsonResponse(await _refrescarMotorData());
+      case "asesores":
+        return jsonResponse(await _asesores());
+      case "precio":
+        return jsonResponse(await _calcularPrecioCOP(body?.data as PrecioInput));
+      case "contenido":
+        return jsonResponse(await _contenido());
+      default:
+        return jsonResponse({ error: `Accion desconocida: ${action}` }, 400);
+    }
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error("ofertas-catalogo error:", msg);
+    return jsonResponse({ error: msg }, 500);
+  }
+});
